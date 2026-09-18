@@ -29,7 +29,9 @@ Choose one hosted or local chat model that supports structured JSON/tool calling
 - No direct database credentials or unrestricted code execution available to the model.
 - A provider fallback or deterministic response path when the model is unavailable.
 
-Suggested initial approach: use the provider's native structured-output API behind a small adapter. Add LangChain only if its message/tool abstractions materially simplify the project. Use LangGraph when the clarification -> validation -> confirmation -> execution workflow needs durable state and resumability. Do not introduce both libraries before a concrete need exists.
+Suggested initial approach: use the provider's native structured-output API behind a small adapter. The target design is a supervisor-style multi-agent system, but Phase 3 should start with one deployed command supervisor and a small number of specialized agent nodes. Add LangChain only if its message/tool abstractions materially simplify the project. Use LangGraph for durable routing and resumable clarification -> validation -> confirmation -> execution workflows. Do not introduce both libraries before a concrete need exists.
+
+The system is multi-agent by responsibility, not by unrestricted agent-to-agent conversation. The command supervisor routes to specialized agents for CRUD intake, analytics, learning analysis, revision planning, and notifications. Agents communicate through typed state and tool results, never by sharing database credentials or writing directly to MongoDB.
 
 ## 4. Agent Runtime and Tools
 

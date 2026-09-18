@@ -29,4 +29,8 @@
 
 - Detailed architecture, schemas, and API contracts: [`plan.md`](./plan.md)
 - Agentic AI prerequisites and readiness criteria: [`agentic_prerequisites.md`](./agentic_prerequisites.md)
+- Architecture overview and trust boundaries: [`architecture_overview.md`](./architecture_overview.md)
+- Request and database data flows: [`architecture_data_flow.md`](./architecture_data_flow.md)
+- Multi-agent roles, communication, and tool contracts: [`architecture_agents.md`](./architecture_agents.md)
+- Reliability, guardrails, evaluations, and operations: [`architecture_operations.md`](./architecture_operations.md)
 - Environment diagnostic tool: [`check_prerequisites.bat`](./check_prerequisites.bat)

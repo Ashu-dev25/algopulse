@@ -22,14 +22,14 @@
 
 ## 1. Project Overview
 
-| Feature                     | Description                                                                          |
-| :-------------------------- | :----------------------------------------------------------------------------------- |
-| **Dual Workspaces**         | 🟢 **Solved Archive** + 🟠 **Tried & Unsolved Lab** with 1-click promotion           |
-| **Streak Engine**           | User-configurable daily target $N$. Auto-evaluates at midnight in user timezone      |
-| **LeetCode Sync**           | On-demand GraphQL sync with deduplication and timezone-correct date attribution      |
-| **URL Validator**           | Strict regex proof-URL checker. Rejects generic problem links. Auto-detects platform |
-| **Analytics**               | Current week/month summaries with exact date ranges, daily activity, and platform counts |
-| **MongoDB 512MB Optimized** | All documents < 350 bytes. Links replace blobs                                       |
+| Feature                     | Description                                                                                     |
+| :-------------------------- | :---------------------------------------------------------------------------------------------- |
+| **Dual Workspaces**         | 🟢 **Solved Archive** + 🟠 **Tried & Unsolved Lab** with 1-click promotion                      |
+| **Streak Engine**           | User-configurable daily target $N$. Auto-evaluates at midnight in user timezone                 |
+| **LeetCode Sync**           | On-demand GraphQL sync with deduplication and timezone-correct date attribution                 |
+| **URL Validator**           | Strict regex proof-URL checker. Rejects generic problem links. Auto-detects platform            |
+| **Analytics**               | Current week/month summaries with exact date ranges, daily activity, and platform counts        |
+| **MongoDB 512MB Optimized** | All documents < 350 bytes. Links replace blobs                                                  |
 | **Agentic Workflow**        | Prompt-driven CRUD, clarification, confirmation, learning analysis, revision, and notifications |
 
 ---
@@ -127,6 +127,13 @@ const handleCreateProblem = async (e) => {
 ---
 
 ## 4. Phase Status
+
+### Agentic architecture references
+
+- `architecture_overview.md` — system layers, trust boundaries, and technology roles.
+- `architecture_data_flow.md` — command, analytics, learning, revision, and notification flows.
+- `architecture_agents.md` — supervisor routing, specialized agents, shared typed state, and tools.
+- `architecture_operations.md` — guardrails, evaluation layers, observability, deployment, and failure behavior.
 
 ### ✅ PHASE 1 — COMPLETE (Backend + Frontend)
 
@@ -314,23 +321,27 @@ const handleCreateProblem = async (e) => {
 ```
 
 ### Phase 3-4 Agent Data Additions
+
 These planned model changes remain lean and user-scoped.
 
 #### `agent_conversations` (transient)
+
 ```json
 {
   "_id": "ObjectId",
   "user_id": "ObjectId",
   "state": "awaiting_details|awaiting_confirmation|complete|expired",
   "intent": "add_problem|update_problem|delete_problem|analyse_period|analyse_learning",
-  "slots": {"title": "...", "status": "tried"},
+  "slots": { "title": "...", "status": "tried" },
   "candidate_ids": ["ObjectId"],
   "expires_at": "2026-09-18T12:00:00Z"
 }
 ```
+
 Use a TTL index on `expires_at`; do not store full prompts or model transcripts by default.
 
 #### `revision_items`
+
 ```json
 {
   "_id": "ObjectId",
@@ -346,9 +357,11 @@ Use a TTL index on `expires_at`; do not store full prompts or model transcripts 
 ```
 
 #### `notifications`
+
 Store only `user_id`, `revision_id`, `kind`, `scheduled_for`, `read_at`, and `created_at`. Add a unique key for `(user_id, revision_id, kind, scheduled_for)` to prevent duplicate due notifications.
 
 #### Required existing-model adjustments
+
 - Ensure `attempts` increments when a tried submission is logged or a problem is retried; the current create/upsert flow must not silently reset it.
 - Preserve immutable `first_attempt_at`; update `solved_at` only on a transition to solved.
 - Normalize tags and stuck categories so telemetry can group them consistently.
