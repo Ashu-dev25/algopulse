@@ -4,7 +4,11 @@ echo       AlgoPulse - Prerequisites Diagnostic Check
 echo ===================================================
 echo.
 
+<<<<<<< HEAD
 echo [1/6] Checking Python...
+=======
+echo [1/5] Checking Python...
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 python --version 2>nul
 if %errorlevel% neq 0 (
     echo [ERROR] Python is NOT installed or not in PATH!
@@ -14,7 +18,11 @@ if %errorlevel% neq 0 (
 )
 echo.
 
+<<<<<<< HEAD
 echo [2/6] Checking Pip...
+=======
+echo [2/5] Checking Pip...
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 pip --version 2>nul
 if %errorlevel% neq 0 (
     echo [ERROR] Pip is NOT installed or not in PATH!
@@ -23,7 +31,11 @@ if %errorlevel% neq 0 (
 )
 echo.
 
+<<<<<<< HEAD
 echo [3/6] Checking Node.js...
+=======
+echo [3/5] Checking Node.js...
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 node -v 2>nul
 if %errorlevel% neq 0 (
     echo [ERROR] Node.js is NOT installed or not in PATH!
@@ -33,7 +45,11 @@ if %errorlevel% neq 0 (
 )
 echo.
 
+<<<<<<< HEAD
 echo [4/6] Checking NPM...
+=======
+echo [4/5] Checking NPM...
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 npm -v 2>nul
 if %errorlevel% neq 0 (
     echo [ERROR] NPM is NOT installed or not in PATH!
@@ -42,6 +58,7 @@ if %errorlevel% neq 0 (
 )
 echo.
 
+<<<<<<< HEAD
 echo [5/6] Checking Git...
 git --version 2>nul
 if %errorlevel% neq 0 (
@@ -53,6 +70,9 @@ if %errorlevel% neq 0 (
 echo.
 
 echo [6/6] Checking MongoDB...
+=======
+echo [5/5] Checking MongoDB...
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 echo Note: For MongoDB Atlas (Cloud), you only need your Connection String.
 echo Checking for local MongoDB service/CLI...
 mongosh --version 2>nul || mongo --version 2>nul

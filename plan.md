@@ -26,6 +26,7 @@ Designed for lightning-fast logging, automated LeetCode ingestion, strict multi-
 1. **Command Execution**:
    - ⚠️ **NO PowerShell**: All development and runtime commands must be executed using **Command Prompt (`cmd.exe`)**.
 2. **MongoDB Free Tier Optimization (512MB Limit)**:
+<<<<<<< HEAD
    - Zero redundant storage: problem descriptions, large editorials, and heavy source code are referenced via external URLs / links (`sub_url`, `notes_url`, `p_url`) rather than storing multi-kilobyte text blobs in the DB.
    - Target document size: **< 350 bytes**, allowing hundreds of thousands of entries on the 512MB free tier.
 3. **Full-Stack Phase-by-Phase Validation**:
@@ -71,35 +72,120 @@ Phase 4: Agentic AI Telemetry Layer & Assistant Hooks
 └── 4.2 Build Phase 4 Frontend AI recommendations & revision queues.
 
 Phase 5: End-to-End Integration, Testing & Final Polish
+=======
+   - Zero redundant storage: problem descriptions, large editorials, and heavy source code are referenced via external URLs / links (`submission_url`, `notes_url`) rather than storing multi-kilobyte text blobs in the DB.
+   - Target document size: **< 350 bytes**, allowing hundreds of thousands of entries on the 512MB free tier.
+3. **Agentic System Readiness**:
+   - DB schemas include structured learning telemetry (`stuck_reason_code`, `attempts_count`, `solve_duration_min`, `tags`).
+   - Dedicated API surface (`/api/v1/agent/patterns`) to feed future autonomous agents for pattern learning, weak-topic detection, and adaptive revision queues.
+4. **Futuristic, Lightweight Aesthetic**:
+   - Dark mode (`#08090d`), glowing neon borders (`#00f5ff`, `#7928ca`), glassmorphic panels, and high-FPS CSS/SVG micro-animations with zero graphic bloat.
+
+---
+
+## 🏗️ 3. System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Frontend["Frontend (React + Vite + Recharts)"]
+        UI[Futuristic Glassmorphic Dark UI]
+        BarChart[Monthly Solve Volume Bar Chart]
+        LineChart[Interactive Progress Line Chart]
+        Heatmap[Daily Activity Heatmap Grid]
+        SolvedTab[Solved Archive & Filter Grid]
+        TriedTab[Tried & Unsolved Lab]
+        AddModal[Submission Proof Validator Modal]
+        SyncBtn[LeetCode Instant Sync]
+    end
+
+    subgraph Backend["Backend (FastAPI + Async Motor)"]
+        Router[REST API Endpoints]
+        StreakEngine[Daily Target & Streak Evaluator]
+        LCSync[LeetCode GraphQL Sync Worker]
+        ProofValidator[Submission URL Regex & Inspector]
+        AgentHooks[Agentic Telemetry & Pattern API]
+    end
+
+    subgraph DB["MongoDB Free-Tier (Ultra-Lean Schema)"]
+        UsersCol[(users ~250B/doc)]
+        ProblemsCol[(problems ~320B/doc)]
+        StreaksCol[(daily_streaks ~120B/doc)]
+    end
+
+    subgraph External["External Platforms"]
+        LC[LeetCode GraphQL API]
+        CF[Codeforces API / Submissions]
+        Other[CodeChef / GFG / AtCoder]
+    end
+
+    UI --> Router
+    BarChart -- "Click Month Filter" --> LineChart
+    LineChart --> Router
+    Heatmap --> Router
+    SolvedTab --> Router
+    TriedTab --> Router
+    AddModal --> Router
+    SyncBtn --> Router
+
+    Router --> StreakEngine
+    Router --> ProofValidator
+    Router --> LCSync
+    Router --> AgentHooks
+
+    LCSync <--> LC
+    ProofValidator <--> CF
+    ProofValidator <--> Other
+
+    StreakEngine --> StreaksCol
+    StreakEngine --> UsersCol
+    Router --> ProblemsCol
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 ```
 
 ---
 
 ## 🗄️ 4. Ultra-Lean Database Schema (MongoDB Free-Tier Optimized)
 
+<<<<<<< HEAD
+=======
+To guarantee the entire application operates seamlessly within MongoDB's **512MB free tier** for years without bloat, each model is designed with high data density.
+
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 ### 4.1. `users` Collection (`~250 bytes / doc`)
 ```json
 {
   "_id": "ObjectId",
   "username": "coder123",
+<<<<<<< HEAD
   "email": "coder@example.com",
   "password_hash": "$2b$12$...",
+=======
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
   "lc_handle": "johndoe_lc",
   "daily_target": 2,
   "timezone": "Asia/Kolkata",
   "current_streak": 5,
   "longest_streak": 24,
+<<<<<<< HEAD
   "last_active_date": "2026-09-18",
+=======
+  "last_active_date": "2026-09-09",
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
   "today_solved": 3,
   "created_at": "2026-09-01T00:00:00Z"
 }
 ```
 
 ### 4.2. `problems` Collection (`~320 bytes / doc`)
+<<<<<<< HEAD
+=======
+> **Optimization Strategy**: We store essential searchable metadata and link pointers (`submission_url`, `notes_url`) instead of huge raw text/code snippets.
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 ```json
 {
   "_id": "ObjectId",
   "user_id": "ObjectId",
+<<<<<<< HEAD
   "platform": "codeforces",
   "p_id": "codeforces-recent-actions",
   "title": "Recent Actions",
@@ -116,6 +202,38 @@ Phase 5: End-to-End Integration, Testing & Final Polish
   "stuck_category": null,
   "created_at": "2026-09-18T10:15:00Z",
   "updated_at": "2026-09-18T10:15:00Z"
+=======
+  "platform": "leetcode", 
+  "p_id": "lc-15",
+  "title": "3Sum",
+  "p_url": "https://leetcode.com/problems/3sum/",
+  "sub_url": "https://leetcode.com/submissions/detail/123456789/",
+  "difficulty": "Medium",
+  "tags": ["Array", "Two Pointers"],
+  "status": "solved",
+  "attempts": 2,
+  "solved_at": "2026-09-09T10:15:00Z",
+  "first_attempt_at": "2026-09-08T14:20:00Z",
+  
+  "brief_note": "Two pointers with sorted array; skip dups.",
+  "notes_url": "https://gist.github.com/... or notion link (optional)",
+  
+  "stuck_category": "tle",
+  "review_due": "2026-09-16"
+}
+```
+
+### 4.3. `daily_streaks` Collection (`~120 bytes / doc`)
+```json
+{
+  "_id": "ObjectId",
+  "user_id": "ObjectId",
+  "date": "2026-09-09",
+  "solved_count": 3,
+  "target_met": true,
+  "target_req": 2,
+  "month": "2026-09"
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 }
 ```
 
@@ -269,6 +387,7 @@ Phase 1: Backend Foundation & Lean DB (FastAPI + Async Motor)
 ├── 1.2 Setup Async Motor connection with indexes on user_id, date, status, month.
 ├── 1.3 Implement lean Pydantic models (<350 bytes footprint).
 ├── 1.4 Build strict Multi-Platform Submission URL Regex Validator.
+<<<<<<< HEAD
 ├── 1.5 Implement the DB connection.
 ├── 1.6 Implement the CRUD operations of users and problems.
 ├── 1.7 Implement User Authentication(login, logout, register, isLoggedIn).
@@ -277,6 +396,8 @@ Phase 1: Backend Foundation & Lean DB (FastAPI + Async Motor)
 
 
 
+=======
+>>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 
 Phase 2: LeetCode Engine & Streak Calculator
 ├── 2.1 Implement async LeetCode GraphQL fetcher for user submissions.
