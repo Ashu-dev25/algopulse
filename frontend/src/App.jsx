@@ -3,7 +3,6 @@ import AuthView from './components/AuthView';
 import Header from './components/Header';
 import ProblemCRUD from './components/ProblemCRUD';
 import ProfileModal from './components/ProfileModal';
-import ValidatorPlayground from './components/ValidatorPlayground';
 import { authApi, getAuthToken, removeAuthToken } from './api/client';
 
 export default function App() {
@@ -14,7 +13,6 @@ export default function App() {
 
   // Modals
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isValidatorOpen, setIsValidatorOpen] = useState(false);
   const [toast, setToast] = useState(null);
 
   // 2) Toast Notification Helper
@@ -105,22 +103,9 @@ export default function App() {
   // 7) Render Authenticated Phase 1 Dashboard
   return (
     <div style={{ padding: '0 16px 40px 16px' }}>
-      {/* Toast Alert */}
+      {/* Toast Notification */}
       {toast && (
-        <div style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: 1000,
-          background: toast.type === 'error' ? 'rgba(239, 68, 68, 0.95)' : 'rgba(18, 20, 32, 0.95)',
-          border: toast.type === 'error' ? '1px solid #ef4444' : '1px solid rgba(0, 242, 254, 0.5)',
-          color: '#f3f4f6',
-          padding: '12px 18px',
-          borderRadius: '10px',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
-          fontSize: '0.88rem',
-          fontWeight: 500
-        }}>
+        <div className={`toast ${toast.type}`}>
           {toast.msg}
         </div>
       )}
@@ -144,15 +129,9 @@ export default function App() {
         user={user}
         onProfileUpdated={(updated) => {
           setUser(updated);
-          showToast('Profile preferences updated!', 'success');
+          showToast('Profile updated!', 'success');
         }}
         onAccountDeleted={handleAccountDeleted}
-      />
-
-      {/* URL Validator Playground Modal */}
-      <ValidatorPlayground
-        isOpen={isValidatorOpen}
-        onClose={() => setIsValidatorOpen(false)}
       />
     </div>
   );

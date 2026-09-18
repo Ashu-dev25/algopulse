@@ -1,191 +1,285 @@
-# 🚀 AlgoPulse: Daily Problem Tracking & Streak Management System
+# 🚀 AlgoPulse — Daily Problem Tracking & Streak System
 
-A high-performance, automated competitive programming and problem-solving tracker built with **FastAPI**, **React (Vite)**, and **MongoDB (Ultra-Lean Free-Tier Optimized)**.
-
-Designed for lightning-fast logging, automated LeetCode ingestion, strict multi-platform submission verification, customizable streak goals ($N$ problems/day), interactive monthly drilldown analytics, and built-in **AI Agent telemetry hooks** for future autonomous productivity agents.
-
----
-
-## 📌 1. Project Overview & Core Value Proposition
-
-| Feature | Description |
-| :--- | :--- |
-| **Dual Workspaces** | 🟢 **Solved Archive** (Accepted solutions) & 🟠 **Tried & Unsolved Lab** (Stuck/Failed attempts, blocker tags, 1-click promotion). |
-| **Customizable Streak Engine** | Tracks active & longest streaks based on user-defined target $N$ ($N \ge 1$). Auto-evaluates daily status at 23:59:59 in user's timezone. |
-| **Automated LeetCode Ingestion** | Background and on-demand sync via LeetCode's public GraphQL API. Auto-sorts verdicts into Solved vs Tried with deduplication. |
-| **Strict Submission Link Validator** | Enforces submission/verdict proof URLs (Codeforces, CodeChef, GFG, AtCoder, HackerRank, etc.) and strictly rejects generic problem links. |
-| **Interactive Analytics & Drilldown** | 📊 Monthly Bar Graph + 📈 Interactive Month Drilldown Line Graph (Current Streak, Longest Streak, Cumulative Solved, Weekly Pace). Clicking any month dynamically updates the detailed daily timeline. |
-| **512MB MongoDB Free-Tier Optimization** | Ultra-lean schema design (~300 bytes/document). Offloads heavy blobs by using URLs/links, ensuring 1,000,000+ problems can fit comfortably. |
-| **Agentic AI Architecture Readiness** | Structured behavioral telemetry (`stuck_category`, `attempt_intervals`, `topic_decay`) and `/agent/` API hooks ready for future autonomous AI coaching agents. |
-| **Futuristic & Lightweight UI** | Sleek cyberpunk/dark-obsidian aesthetic with neon accents, glassmorphic cards, and crisp micro-interactions without heavy graphic lag. |
+> A full-stack competitive programming tracker built with **FastAPI + React (Vite) + MongoDB**.
+> This file is the **single source of truth** for the project. Any new IDE, developer, or AI agent starting
+> work on this project must follow every rule and constraint listed here before writing a single line of code.
 
 ---
 
-## 🛠️ 2. Constraints & Engineering Principles
+## 📋 TABLE OF CONTENTS
 
-1. **Command Execution**:
-   - ⚠️ **NO PowerShell**: All development and runtime commands must be executed using **Command Prompt (`cmd.exe`)**.
-2. **MongoDB Free Tier Optimization (512MB Limit)**:
-<<<<<<< HEAD
-   - Zero redundant storage: problem descriptions, large editorials, and heavy source code are referenced via external URLs / links (`sub_url`, `notes_url`, `p_url`) rather than storing multi-kilobyte text blobs in the DB.
-   - Target document size: **< 350 bytes**, allowing hundreds of thousands of entries on the 512MB free tier.
-3. **Full-Stack Phase-by-Phase Validation**:
-   - Every phase develops both Backend APIs and Frontend UI together so that you can directly test and verify in the browser before moving to the next phase.
-4. **Step-by-Step Numbered Comments**:
-   - Every function across backend and frontend contains explicit `# 1)`, `# 2)` step comments.
-5. **Futuristic, Lightweight Aesthetic**:
-   - Dark obsidian background (`#08090e`), glassmorphic panels, glowing neon cyan/purple accents, and smooth 60fps micro-interactions with zero graphic bloat.
+1. [Project Overview](#1-project-overview)
+2. [Strict Development Rules](#2-strict-development-rules) ← **Read before any implementation**
+3. [Tech Stack](#3-tech-stack)
+4. [Phase Status — What Is Done & What Is Next](#4-phase-status)
+5. [Database Schema](#5-database-schema)
+6. [REST API Map](#6-rest-api-map)
+7. [UI Design System](#7-ui-design-system) ← **Updated with professional design rules**
+8. [Feature Specifications](#8-feature-specifications)
+9. [File & Folder Structure](#9-file--folder-structure)
 
 ---
 
-## 🗺️ 3. Full-Stack Phase Roadmap
+## 1. Project Overview
 
-```text
-Phase 1: Backend Foundation, Auth, User & Problem CRUD + Phase 1 Client UI [CURRENT]
-├── 1.1 Create FastAPI app structure with CMD-compatible scripts (setup_phase1.bat, start_phase1.bat).
-├── 1.2 Setup Async Motor connection with compound indexes on user_id, date, status, sub_id.
-├── 1.3 Implement lean Pydantic models (<350 bytes footprint).
-├── 1.4 Build strict Multi-Platform Submission URL Regex Validator (Codeforces, CodeChef, GFG, AtCoder, HackerRank, LeetCode).
-├── 1.5 Implement the DB connection pool with async lifespan management.
-├── 1.6 Implement User CRUD (/users/profile, /users/account) & Problem CRUD (/problems).
-├── 1.7 Implement User Authentication (/auth/register, /auth/login, /auth/logout, /auth/isLoggedIn).
-├── 1.8 Implement proper error handling for all operations using try-except blocks.
-└── 1.9 Build Phase 1 Frontend Client (React + Vite):
-    ├── AuthView.jsx (Signup & Signin)
-    ├── ProblemCRUD.jsx (Interactive Problem list, filters, edit, delete, and live URL validator)
-    ├── ProfileModal.jsx (User profile & account settings)
-    └── ValidatorPlayground.jsx (Testing lab for submission links)
-
-Phase 2: LeetCode Engine, Streak Calculator & Sync UI [NEXT]
-├── 2.1 Implement async LeetCode GraphQL fetcher for user submissions.
-├── 2.2 Build auto-classification & deduplication pipeline with timezone timestamp mapping.
-├── 2.3 Implement Streak Calculation Engine (target N validation, daily rollups).
-└── 2.4 Build Phase 2 Frontend components (LeetCode instant sync button, Streak HUD badge, live progress bar).
-
-Phase 3: Interactive Analytics & Progress Drilldowns + Analytics UI
-├── 3.1 Implement /analytics/monthly-volume (Monthly Solved Bar Chart data).
-├── 3.2 Implement /analytics/progress-timeline?month=YYYY-MM (Daily Progress Line Chart drilldown).
-└── 3.3 Build Phase 3 Frontend (Recharts Monthly Bar Chart with click-to-drilldown, Multi-Metric Line Graph, Heatmap).
-
-Phase 4: Agentic AI Telemetry Layer & Assistant Hooks
-├── 4.1 Implement /agent/telemetry/patterns (failure clusters, topic decay, velocity).
-└── 4.2 Build Phase 4 Frontend AI recommendations & revision queues.
-
-Phase 5: End-to-End Integration, Testing & Final Polish
-=======
-   - Zero redundant storage: problem descriptions, large editorials, and heavy source code are referenced via external URLs / links (`submission_url`, `notes_url`) rather than storing multi-kilobyte text blobs in the DB.
-   - Target document size: **< 350 bytes**, allowing hundreds of thousands of entries on the 512MB free tier.
-3. **Agentic System Readiness**:
-   - DB schemas include structured learning telemetry (`stuck_reason_code`, `attempts_count`, `solve_duration_min`, `tags`).
-   - Dedicated API surface (`/api/v1/agent/patterns`) to feed future autonomous agents for pattern learning, weak-topic detection, and adaptive revision queues.
-4. **Futuristic, Lightweight Aesthetic**:
-   - Dark mode (`#08090d`), glowing neon borders (`#00f5ff`, `#7928ca`), glassmorphic panels, and high-FPS CSS/SVG micro-animations with zero graphic bloat.
+| Feature                     | Description                                                                          |
+| :-------------------------- | :----------------------------------------------------------------------------------- |
+| **Dual Workspaces**         | 🟢 **Solved Archive** + 🟠 **Tried & Unsolved Lab** with 1-click promotion           |
+| **Streak Engine**           | User-configurable daily target $N$. Auto-evaluates at midnight in user timezone      |
+| **LeetCode Sync**           | On-demand GraphQL sync with deduplication and timezone-correct date attribution      |
+| **URL Validator**           | Strict regex proof-URL checker. Rejects generic problem links. Auto-detects platform |
+| **Analytics**               | Current week/month summaries with exact date ranges, daily activity, and platform counts |
+| **MongoDB 512MB Optimized** | All documents < 350 bytes. Links replace blobs                                       |
+| **Agentic Workflow**        | Prompt-driven CRUD, clarification, confirmation, learning analysis, revision, and notifications |
 
 ---
 
-## 🏗️ 3. System Architecture
+## 2. Strict Development Rules
 
-```mermaid
-flowchart TD
-    subgraph Frontend["Frontend (React + Vite + Recharts)"]
-        UI[Futuristic Glassmorphic Dark UI]
-        BarChart[Monthly Solve Volume Bar Chart]
-        LineChart[Interactive Progress Line Chart]
-        Heatmap[Daily Activity Heatmap Grid]
-        SolvedTab[Solved Archive & Filter Grid]
-        TriedTab[Tried & Unsolved Lab]
-        AddModal[Submission Proof Validator Modal]
-        SyncBtn[LeetCode Instant Sync]
-    end
+> ⚠️ These rules are **non-negotiable**. Every developer or AI agent working on this project must follow all of them.
 
-    subgraph Backend["Backend (FastAPI + Async Motor)"]
-        Router[REST API Endpoints]
-        StreakEngine[Daily Target & Streak Evaluator]
-        LCSync[LeetCode GraphQL Sync Worker]
-        ProofValidator[Submission URL Regex & Inspector]
-        AgentHooks[Agentic Telemetry & Pattern API]
-    end
+### Rule 1 — One Phase at a Time
 
-    subgraph DB["MongoDB Free-Tier (Ultra-Lean Schema)"]
-        UsersCol[(users ~250B/doc)]
-        ProblemsCol[(problems ~320B/doc)]
-        StreaksCol[(daily_streaks ~120B/doc)]
-    end
+- **Never start Phase N+1 before Phase N is fully tested and verified** by the user in the browser.
+- Each phase = backend code + frontend UI for that phase + user approval before moving on.
 
-    subgraph External["External Platforms"]
-        LC[LeetCode GraphQL API]
-        CF[Codeforces API / Submissions]
-        Other[CodeChef / GFG / AtCoder]
-    end
+### Rule 2 — Phase Implementation Documentation
 
-    UI --> Router
-    BarChart -- "Click Month Filter" --> LineChart
-    LineChart --> Router
-    Heatmap --> Router
-    SolvedTab --> Router
-    TriedTab --> Router
-    AddModal --> Router
-    SyncBtn --> Router
+- Every phase must have a written section in `phase_implementation.md` that explains:
+  - **WHAT** was built
+  - **HOW** it was built (implementation approach)
+  - **WHY** it was done that way (reasoning behind choices)
+- This must be updated as each phase is completed.
 
-    Router --> StreakEngine
-    Router --> ProofValidator
-    Router --> LCSync
-    Router --> AgentHooks
+### Rule 3 — Numbered Step Comments in Every Function
 
-    LCSync <--> LC
-    ProofValidator <--> CF
-    ProofValidator <--> Other
+Every function — backend (Python) and frontend (JavaScript/JSX) — **must** have numbered step comments:
 
-    StreakEngine --> StreaksCol
-    StreakEngine --> UsersCol
-    Router --> ProblemsCol
->>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
+```python
+# Example: Python backend
+async def login(credentials, db):
+    # 1) Validate input fields are not empty
+    # 2) Fetch user from DB by email
+    # 3) Verify bcrypt password hash
+    # 4) Generate JWT token
+    # 5) Return token and user object
 ```
 
+```javascript
+// Example: Frontend JSX
+const handleCreateProblem = async (e) => {
+  // Step A: Prevent default form submission
+  // Step B: Validate URL is not a generic problem link
+  // Step C: Submit to backend API
+  // Step D: Reset form state and close modal
+};
+```
+
+### Rule 4 — Simple Implementation First
+
+- Choose the **simplest implementation** that works correctly.
+- No premature optimization, no over-engineering, no complex abstractions unless truly needed.
+- If two approaches achieve the same outcome, always pick the simpler one.
+
+### Rule 5 — Terminal: Command Prompt Only
+
+- ⚠️ **Never use PowerShell**. All commands must be run in `cmd.exe` (Command Prompt).
+- All `.bat` scripts must be compatible with `cmd.exe` syntax.
+
+### Rule 6 — MongoDB 512MB Free Tier
+
+- Every document must stay **under 350 bytes**.
+- Never store large text (code, editorials, descriptions) in the database. Store **links/URLs** instead.
+- Fields: `sub_url`, `p_url`, `notes_url` — external links, never raw content.
+
+### Rule 7 — Validation Must Be Integrated
+
+- URL validation is **not a separate step** — it runs inside `handleCreateProblem` / `addSubmission`.
+- Only one submit button exists. Validation runs automatically before the API call.
+- The platform field must **auto-detect** from the URL. The user should never need to manually pick a platform if they provide a URL from a known platform.
+
+### Rule 8 — State Management: Minimize Re-renders
+
+- Prefer `useRef` over `useState` for values that do not affect rendering (timers, previous values).
+- Use `useCallback` and `useMemo` where functions/values are passed as props to child components.
+- Use a single `useContext` (or a shared parent state) instead of prop-drilling the same data through 3+ levels.
+- Never create a new state variable if an existing one can serve the same purpose.
+
+### Rule 9 — Design Must Be Premium (Not Just Functional)
+
+- The frontend **must not look like a basic CRUD form**. It must feel like a professional dashboard.
+- See **Section 7 (UI Design System)** for exact color tokens, typography, spacing, animation, and component rules.
+- Every component must reference the design system — no ad-hoc inline colors that contradict the palette.
+
 ---
 
-## 🗄️ 4. Ultra-Lean Database Schema (MongoDB Free-Tier Optimized)
+## 3. Tech Stack
 
-<<<<<<< HEAD
-=======
-To guarantee the entire application operates seamlessly within MongoDB's **512MB free tier** for years without bloat, each model is designed with high data density.
+| Layer           | Technology                                                       | Notes                                  |
+| :-------------- | :--------------------------------------------------------------- | :------------------------------------- |
+| **Backend**     | Python 3.11+, FastAPI, Motor (async), Pydantic v2                | Async everywhere                       |
+| **Database**    | MongoDB Atlas (Free Tier 512MB)                                  | Indexed on `user_id`, `status`, `date` |
+| **Auth**        | JWT Bearer tokens via `python-jose`, bcrypt via `passlib`        | Stored in `localStorage`               |
+| **Frontend**    | React 18, Vite, Vanilla CSS (no Tailwind)                        | Recharts for analytics                 |
+| **API Client**  | Centralized `client.js` with auto Bearer injection               | Handles 401 globally                   |
+| **Dev Runtime** | `cmd.exe` scripts only — `start_phase1.bat`, `setup_backend.bat` | Never PowerShell                       |
 
->>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
-### 4.1. `users` Collection (`~250 bytes / doc`)
+---
+
+## 4. Phase Status
+
+### ✅ PHASE 1 — COMPLETE (Backend + Frontend)
+
+> Status: **Tested and ready for user validation**
+
+#### What was built:
+
+**Backend (`backend/`):**
+
+- `app/core/config.py` — `.env` reader for DB URL, JWT secret, defaults
+- `app/core/security.py` — bcrypt password hashing + JWT encode/decode
+- `app/core/database.py` — Async Motor pool with compound indexes
+- `app/models/schemas.py` — Lean Pydantic models (< 350 bytes/doc)
+- `app/services/validator.py` — Multi-platform strict URL regex validator with auto-detection
+- `app/api/auth.py` — `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/isLoggedIn`
+- `app/api/users.py` — `/users/profile` (GET, PUT), `/users/account` (DELETE)
+- `app/api/problems.py` — `/problems` (POST, GET, GET/:id, PUT/:id, DELETE/:id)
+- `app/api/validator.py` — `/validate/submission-url`
+- `main.py` — FastAPI app with lifespan DB connect/disconnect
+
+**Frontend (`frontend/src/`):**
+
+- `api/client.js` — Centralized API client with auto Bearer injection + 401 global handler
+- `components/AuthView.jsx` — Login + Register view
+- `components/Header.jsx` — Logo, user badge, profile/logout buttons
+- `components/ProblemCRUD.jsx` — Problem list with filters, single "Add Problem" button, live URL validator, auto platform detection (⚡ badge), edit/delete modals
+- `components/ProfileModal.jsx` — LeetCode handle, daily target, timezone, account delete
+- `components/ValidatorPlayground.jsx` — Standalone URL testing laboratory
+- `styles/index.css` — Design system (CSS variables, glassmorphism, buttons, inputs)
+
+#### Platform Validator Rules (currently enforced):
+
+| Platform                        | Submission URL Required                     | Falls Under                                                |
+| :------------------------------ | :------------------------------------------ | :--------------------------------------------------------- |
+| LeetCode                        | `leetcode.com/problems/slug/submissions/ID` | Strict regex                                               |
+| Codeforces                      | `codeforces.com/contest/ID/submission/ID`   | Strict regex                                               |
+| CodeChef                        | `codechef.com/viewsolution/ID`              | Strict regex                                               |
+| AtCoder                         | `atcoder.jp/contests/ID/submissions/ID`     | Strict regex                                               |
+| GFG, HackerRank, and all others | Any valid `https://...` URL                 | `other` category — no shareable submission links available |
+
+---
+
+### 🔜 PHASE 2 — NEXT (LeetCode Sync + Streak Engine)
+
+> Status: **Pending Phase 1 user validation**
+
+**What to build:**
+
+**Backend:**
+
+- `app/services/leetcode_sync.py` — Async GraphQL fetcher using `recentSubmissionList(username, limit: 20)`
+  - Auto-converts Unix timestamps to user timezone (e.g. `Asia/Kolkata`)
+  - Anti-bleed: submission at `23:30 yesterday` is dated yesterday, not today
+  - Deduplication via unique index `(user_id, platform, p_id)`
+  - `Accepted` → `solved`, everything else → `tried`
+- `app/services/streak_engine.py` — Daily streak calculator
+  - Reads today's `solved_count` from `daily_streaks` collection
+  - Increments `current_streak` if `solved_count >= daily_target`
+  - Resets streak to 0 if missed day; updates `longest_streak` if new record
+- `app/api/sync.py` — `POST /sync/leetcode`, `GET /sync/status`
+- `app/api/streak.py` — `GET /streak/overview`, `GET /streak/heatmap`
+- New collection: `daily_streaks` (`~120 bytes/doc`)
+
+**Frontend:**
+
+- `components/StreakHUD.jsx` — Streak pill: `🔥 7 Days | Today 2/3 ◻◻◼`
+- `components/SyncButton.jsx` — LeetCode sync trigger with spinner + last-synced timestamp
+- Progress bar in Header showing today's `solved / target`
+
+---
+
+### ⚪ PHASE 3 — Analytics Dashboard (Pending Phase 2)
+
+**Purpose:** Add a natural-language command surface while keeping the existing CRUD and validator services as the source of truth. Commands such as `add <problem link>`, `analyse my current week`, and `analyse my current month` resolve into typed intents.
+
+**Backend:**
+
+- Add an `app/agents/` orchestration layer with typed intents: `add_problem`, `list_problems`, `update_problem`, `delete_problem`, and `analyse_period`.
+- Add `POST /agent/command`, which returns a clarification question, a confirmation preview, or a typed result. The model never accesses MongoDB directly.
+- Add `GET /analytics/summary?period=week|month` and `GET /analytics/platforms?period=week|month`. Resolve calendar boundaries using the user's timezone and return the exact `from`/`to` dates.
+- For `add <link>`, extract what is safe, call the existing submission URL validator, ask for missing title/status/difficulty/tags, then submit a normal `ProblemCreate` payload.
+- For conversational CRUD, return candidate records and require the user to choose and confirm before update/delete mutations.
+
+**Frontend:**
+
+- Add a command console and transcript with loading, clarification, confirmation, validation-error, and retry states.
+- Add week/month analytics controls. Results must show solved totals, tried totals, exact date range, daily activity, and a platform breakdown, including a message such as “This week you solved X problems on LeetCode and Y across other platforms.”
+
+**Guardrails:** Validate every intent and argument with Pydantic schemas; never invent URLs, dates, platform facts, or DB results; keep normal CRUD and fixed analytics endpoints available if the model is unavailable.
+
+---
+
+### ⚪ PHASE 4 — Learning Coach, Revision Agent & Notifications (Pending Phase 3)
+
+**Purpose:** Use the user's tried problems, repeated failures, tags, stuck categories, attempts, and recency to identify weak topics and produce a revision sheet using a spaced-repetition cycle.
+
+**Backend:**
+
+- Add deterministic, user-scoped telemetry for status, tags, `stuck_category`, attempts, `first_attempt_at`, `solved_at`, and recency. Missing tags are insufficient evidence, not permission to guess.
+- Extend the command agent for `analyse my current learning`; add `GET /agent/learning/summary`, `GET /agent/revision/due`, and `POST /agent/revision/{id}/review`.
+- Give the LLM only aggregated evidence and candidate problem IDs. It explains and ranks candidates but cannot create facts or write directly to the database.
+- Add compact `revision_items` records with `problem_id`, `next_review_at`, `review_count`, `last_review_at`, `review_result`, and `reason_codes`. Use intervals such as 1, 3, 7, 14, and 30 days, adjusted by review outcome.
+- Add in-app notification records and notification preferences. Create a due notification once per revision item, rather than on every dashboard load.
+- Prioritize recent tried problems, repeated failure categories, weak tags with enough evidence, and overdue reviews. Include solved problems only when their review is due or they anchor a weak topic.
+
+**Frontend:**
+
+- Add “Current learning” results with evidence counts, weak topics, confidence, and links to source problems.
+- Add a revision sheet grouped into `due today`, `upcoming`, and `recently completed`, with recommendation reasons and a mark-reviewed action.
+- Add an in-app notification center and preference controls.
+
+**Acceptance checks:** Recommendations are reproducible from fixtures, include source problem IDs, rank repeated failures appropriately, state when evidence is insufficient, and never cross user boundaries.
+
+---
+
+### ⚪ PHASE 5 — Agent Evaluation, Reliability & Production Polish (Pending Phase 4)
+
+- Create offline evals for intent detection, missing-field extraction, date-range resolution, platform summaries, CRUD confirmation, and revision ranking.
+- Test prompt injection in URLs/notes, malformed model output, unsupported requests, timeouts, duplicate commands, and partial notification failures.
+- Add Pydantic/Guardrails validation, rate limits, token and timeout budgets, redacted audit logs, and optional LangSmith tracing with sensitive data excluded.
+- Verify MongoDB indexes and TTL retention for transient conversations/notifications, frontend production build, accessibility, mobile layouts, and end-to-end browser flows.
+
+---
+
+## 5. Database Schema
+
+### `users` (~250 bytes/doc)
+
 ```json
 {
   "_id": "ObjectId",
   "username": "coder123",
-<<<<<<< HEAD
   "email": "coder@example.com",
   "password_hash": "$2b$12$...",
-=======
->>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
   "lc_handle": "johndoe_lc",
   "daily_target": 2,
   "timezone": "Asia/Kolkata",
   "current_streak": 5,
   "longest_streak": 24,
-<<<<<<< HEAD
   "last_active_date": "2026-09-18",
-=======
-  "last_active_date": "2026-09-09",
->>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
   "today_solved": 3,
   "created_at": "2026-09-01T00:00:00Z"
 }
 ```
 
-### 4.2. `problems` Collection (`~320 bytes / doc`)
-<<<<<<< HEAD
-=======
-> **Optimization Strategy**: We store essential searchable metadata and link pointers (`submission_url`, `notes_url`) instead of huge raw text/code snippets.
->>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
+### `problems` (~320 bytes/doc)
+
+> Links replace blobs. Never store raw code, editorials, or long text.
+
 ```json
 {
   "_id": "ObjectId",
   "user_id": "ObjectId",
-<<<<<<< HEAD
   "platform": "codeforces",
   "p_id": "codeforces-recent-actions",
   "title": "Recent Actions",
@@ -197,232 +291,415 @@ To guarantee the entire application operates seamlessly within MongoDB's **512MB
   "attempts": 1,
   "solved_at": "2026-09-18T10:15:00Z",
   "first_attempt_at": "2026-09-18T10:00:00Z",
-  "brief_note": "Greedy scan with two pointers",
+  "brief_note": "Greedy scan with two pointers (max 280 chars)",
   "notes_url": null,
   "stuck_category": null,
   "created_at": "2026-09-18T10:15:00Z",
   "updated_at": "2026-09-18T10:15:00Z"
-=======
-  "platform": "leetcode", 
-  "p_id": "lc-15",
-  "title": "3Sum",
-  "p_url": "https://leetcode.com/problems/3sum/",
-  "sub_url": "https://leetcode.com/submissions/detail/123456789/",
-  "difficulty": "Medium",
-  "tags": ["Array", "Two Pointers"],
-  "status": "solved",
-  "attempts": 2,
-  "solved_at": "2026-09-09T10:15:00Z",
-  "first_attempt_at": "2026-09-08T14:20:00Z",
-  
-  "brief_note": "Two pointers with sorted array; skip dups.",
-  "notes_url": "https://gist.github.com/... or notion link (optional)",
-  
-  "stuck_category": "tle",
-  "review_due": "2026-09-16"
 }
 ```
 
-### 4.3. `daily_streaks` Collection (`~120 bytes / doc`)
+### `daily_streaks` (~120 bytes/doc) — Added in Phase 2
+
 ```json
 {
   "_id": "ObjectId",
   "user_id": "ObjectId",
-  "date": "2026-09-09",
+  "date": "2026-09-18",
   "solved_count": 3,
   "target_met": true,
   "target_req": 2,
   "month": "2026-09"
->>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
 }
 ```
 
----
+### Phase 3-4 Agent Data Additions
+These planned model changes remain lean and user-scoped.
 
-## 🎯 5. Core Feature Specifications
+#### `agent_conversations` (transient)
+```json
+{
+  "_id": "ObjectId",
+  "user_id": "ObjectId",
+  "state": "awaiting_details|awaiting_confirmation|complete|expired",
+  "intent": "add_problem|update_problem|delete_problem|analyse_period|analyse_learning",
+  "slots": {"title": "...", "status": "tried"},
+  "candidate_ids": ["ObjectId"],
+  "expires_at": "2026-09-18T12:00:00Z"
+}
+```
+Use a TTL index on `expires_at`; do not store full prompts or model transcripts by default.
 
-### 📂 Feature 1: Dual Workspaces ("Solved Archive" vs "Tried Lab")
-- **🟢 Solved Archive**:
-  - Filterable by Platform, Difficulty (🟢 Easy, 🟡 Medium, 🔴 Hard), Tags, and Date Range.
-  - Card / Compact Table view with quick link to submission proof and external problem link.
-  - Quick note drawer for high-level insight (time/space complexity + approach summary).
-- **🟠 Tried & Unsolved Lab**:
-  - Highlights problems attempted but unresolved.
-  - Blocker category selector: `Time Limit Exceeded (TLE)`, `Wrong Answer (WA)`, `Memory Limit`, `Logic Gap`, `Need Algorithm Insight`.
-  - **1-Click "Promote to Solved"**: Instantly promotes problem to "Solved", updates attempt count, and logs it to today's streak count.
+#### `revision_items`
+```json
+{
+  "_id": "ObjectId",
+  "user_id": "ObjectId",
+  "problem_id": "ObjectId",
+  "priority": 82,
+  "reason_codes": ["recent_tried", "repeated_logic_gap"],
+  "next_review_at": "2026-09-21T09:00:00Z",
+  "last_review_at": "2026-09-18T09:00:00Z",
+  "review_count": 1,
+  "review_result": "again|hard|good|easy"
+}
+```
 
----
+#### `notifications`
+Store only `user_id`, `revision_id`, `kind`, `scheduled_for`, `read_at`, and `created_at`. Add a unique key for `(user_id, revision_id, kind, scheduled_for)` to prevent duplicate due notifications.
 
-### 🔥 Feature 2: Smart Daily Streak & Habit Engine
-- **Target-Driven ($N$ Problems / Day)**:
-  - User-configurable daily goal (e.g., $N = 2$).
-  - Live progress bar: `2 / 2 problems solved today (100% 🔥 Streak Saved!)`.
-  - Automatic streak increment if $\text{solved} \ge N$; resets to 0 if under target at midnight.
-- **Activity Heatmap Grid**:
-  - GitHub/LeetCode style contribution map with color intensity matching volume solved.
-
----
-
-### 📊 Feature 3: Interactive Monthly & Daily Analytics (User Drilldown Specification)
-- **1. Monthly Solved Bar Graph**:
-  - Interactive bar chart displaying total problems solved per month (e.g., Jan, Feb, Mar, ..., Dec).
-  - Hover tooltip displays monthly volume, completion rate, and active days.
-- **2. Interactive Click-to-Drilldown Mechanism**:
-  - **Clicking any month bar**: Filters the line graph and problem timeline specifically for that selected month!
-  - **Deselecting / Default**: If no month is selected, the line graph automatically displays the **Current Month** daily breakdown.
-- **3. Multi-Metric Progress Line Graph**:
-  - Displays daily trajectory for:
-    - ⚡ Current Streak progression
-    - 🏆 Longest Streak milestone
-    - 📈 Cumulative Problems Solved
-    - ⏱️ Weekly Pace / Velocity
-
----
-
-### ⚡ Feature 4: Automated LeetCode Ingestion
-- **Zero-Friction Public Sync**:
-  - Queries LeetCode's public GraphQL API for user's recent submissions:
-    - `recentSubmissionList(username, limit: 20)`
-    - Each item returns: `id` (unique submission ID), `title`, `titleSlug`, `statusDisplay` (`Accepted`, `Wrong Answer`, etc.), and `timestamp` (exact Unix epoch seconds).
-- **Date Attribution & Anti-Bleed Logic**:
-  - **Exact Timestamp Conversion**: Each submission's Unix timestamp is converted to the user's local timezone (e.g., `Asia/Kolkata`) to determine its exact calendar date (`YYYY-MM-DD`).
-  - **No False Today Attribution**: If the 20th submission was solved yesterday at 23:30, it is attributed to yesterday's date (`2026-09-08`), NOT today's date (`2026-09-09`). It will never bleed into today's streak count.
-- **Idempotency & Deduplication**:
-  - Unique index on `(user_id, platform, p_id)` or `sub_id`.
-  - Already-recorded submissions from past syncs are skipped instantly, preventing duplicate records or duplicate streak increments.
-  - `Accepted` $\rightarrow$ Added to `Solved Archive` & attributed to its specific solve date.
-  - `Wrong Answer` / `TLE` $\rightarrow$ Added to `Tried Lab` (if not already solved).
+#### Required existing-model adjustments
+- Ensure `attempts` increments when a tried submission is logged or a problem is retried; the current create/upsert flow must not silently reset it.
+- Preserve immutable `first_attempt_at`; update `solved_at` only on a transition to solved.
+- Normalize tags and stuck categories so telemetry can group them consistently.
+- Add indexes for `(user_id, status, updated_at)`, `(user_id, tags)`, `(user_id, next_review_at)`, and all transient/notification TTL fields.
 
 ---
 
-### 🛡️ Feature 5: Multi-Platform Ingestion & Strict Submission Link Validator
-- Prevents users from accidentally adding generic problem links.
-- **Strict Verification Rules**:
-  | Platform | Valid Submission URL Pattern | Rejected Invalid Pattern |
-  | :--- | :--- | :--- |
-  | **Codeforces** | `codeforces.com/contest/1800/submission/278912301` | `codeforces.com/problemset/problem/1800/E` ❌ |
-  | **CodeChef** | `codechef.com/viewsolution/108923412` | `codechef.com/problems/FLOW001` ❌ |
-  | **GeeksforGeeks** | `geeksforgeeks.org/problems/.../submission/...` | `geeksforgeeks.org/problems/two-sum/1` ❌ |
-  | **AtCoder** | `atcoder.jp/contests/abc340/submissions/50123984` | `atcoder.jp/contests/abc340/tasks/abc340_a` ❌ |
-  | **HackerRank** | `hackerrank.com/challenges/.../submissions/...` | `hackerrank.com/challenges/solve-me-first` ❌ |
-- Instant client-side & server-side regex validation with helpful feedback error tips.
-
----
-
-### 🤖 Feature 6: Agentic AI Readiness Layer (Future-Proof Architecture)
-To support autonomous AI agents that will analyze user habits and optimize productivity in later phases:
-- **Telemetry Endpoints**:
-  - `GET /api/v1/agent/telemetry/patterns`: Aggregates fail/retry patterns, topic decay (topics untouched for >14 days), and stuck categories.
-  - `GET /api/v1/agent/telemetry/velocity`: Calculates time gaps between attempts and streak volatility.
-  - `POST /api/v1/agent/queue/recommend`: Standardized hook allowing an AI agent to inject smart daily recommendations or revision tasks.
-
----
-
-## 🔌 6. REST API Architecture (FastAPI)
+## 6. REST API Map
 
 ```text
 /api/v1
 │
-├── /user
-│   ├── GET  /user/profile               # User profile, streak status, current target N
-│   └── PUT  /user/settings              # Update target N, timezone, LC handle
+├── /auth
+│   ├── POST   /auth/register          # Create account
+│   ├── POST   /auth/login             # Get JWT token
+│   ├── POST   /auth/logout            # Invalidate session
+│   └── GET    /auth/isLoggedIn        # Verify token is still valid
+│
+├── /users
+│   ├── GET    /users/profile          # Read profile + streak meta
+│   ├── PUT    /users/profile          # Update lc_handle, daily_target, timezone
+│   └── DELETE /users/account          # Delete account + all problems
 │
 ├── /problems
-│   ├── GET  /problems                   # List problems (filter: status, platform, difficulty, month)
-│   ├── POST /problems/manual            # Manually add external problem (strict URL validation)
-│   ├── GET  /problems/{id}              # Problem details & metadata
-│   ├── PUT  /problems/{id}              # Update brief note, notes_url, stuck_category
-│   ├── PUT  /problems/{id}/promote      # 1-Click promote 'tried' -> 'solved'
-│   └── DELETE /problems/{id}            # Delete problem
+│   ├── GET    /problems               # List (filter: status, platform, difficulty, search)
+│   ├── POST   /problems               # Create with strict URL validation
+│   ├── GET    /problems/{id}          # Single problem detail
+│   ├── PUT    /problems/{id}          # Update title, status, note, difficulty
+│   └── DELETE /problems/{id}          # Delete problem
 │
-├── /sync
-│   ├── POST /sync/leetcode              # Trigger LeetCode sync
-│   └── GET  /sync/status                # Last sync timestamp & stats
+├── /validate
+│   └── POST   /validate/submission-url  # URL proof validator (returns is_valid + detected_platform)
 │
-├── /streak
-│   ├── GET  /streak/overview            # Current streak, target progress, records
-│   └── GET  /streak/heatmap             # Year-to-date daily count grid
+├── /sync          ← Phase 2
+│   ├── POST   /sync/leetcode
+│   └── GET    /sync/status
 │
-├── /analytics
-│   ├── GET  /analytics/monthly-volume   # Bar chart data: monthly solved counts
-│   ├── GET  /analytics/progress-timeline?month=YYYY-MM # Line chart data for selected/current month
-│   └── GET  /analytics/topic-distribution # Topic mastery distribution
+├── /streak        ← Phase 2
+│   ├── GET    /streak/overview
+│   └── GET    /streak/heatmap
 │
-└── /agent (Future Agentic Hooks)
-    ├── GET  /agent/telemetry/patterns   # Learning curve & failure clusters
-    └── POST /agent/queue/recommend      # Ingest AI-curated revision queue
+├── /analytics     ← Phase 3
+│   ├── GET    /analytics/summary?period=week|month
+│   ├── GET    /analytics/platforms?period=week|month
+│   ├── GET    /analytics/monthly-volume
+│   └── GET    /analytics/progress-timeline?month=YYYY-MM
+│
+└── /agent         ← Phases 3–4
+  ├── POST   /agent/command
+  ├── GET    /agent/learning/summary
+  ├── GET    /agent/revision/due
+  ├── POST   /agent/revision/{id}/review
+  ├── GET    /agent/notifications
+  └── PUT    /agent/notifications/preferences
 ```
 
 ---
 
-## 🎨 7. Frontend UI Design (Futuristic, Minimalist, Fast)
+## 7. UI Design System
 
-- **Color Palette**:
-  - Background: Obsidian Deep Space `#090a0f`
-  - Card Surfaces: Glassmorphism `#12141e` with `backdrop-filter: blur(12px)` and subtle `#1f2438` borders
-  - Primary Accent: Cyber Neon Cyan `#00f2fe` / `#4facfe`
-  - Secondary Accent: Neon Purple `#a855f7`
-  - Solved Green: `#10b981` (with subtle glow)
-  - Tried Amber: `#f59e0b`
-  - Hard Red: `#ef4444`
-- **Component Layout**:
-  1. **Top HUD Bar**: Logo, Streak Counter Pill (`🔥 5 Days | Today 2/2 Complete`), LeetCode Sync Button, "+ Log Submission" Button.
-  2. **Analytics Command Center**:
-     - Monthly Volume Bar Chart (Interactive click filter).
-     - Progress & Velocity Line Graph (Dynamically syncs to selected month or current month).
-     - Activity Heatmap Grid.
-  3. **Dual Workspace View Tabs**:
-     - 🟢 **Solved Archive** (Search, Platform filter, Difficulty pills, notes drawer).
-     - 🟠 **Tried Lab** (Stuck reason filters, editorial links, Promote to Solved button).
-  4. **Modals**:
-     - Submission Proof Ingestion Modal (Live URL regex validator).
+> ⚠️ The current frontend UI is basic and must be significantly improved. Every new component and every redesign of existing components must follow these rules exactly.
+
+### 7.1 — The Problem With the Current UI
+
+The current design has these issues that must be fixed:
+
+- Cards look like plain HTML boxes — no depth, no hierarchy
+- Typography is too uniform — every text element looks the same weight/size
+- The color palette is applied too timidly — neon accents should define the design, not be sprinkled
+- Input fields and dropdowns look like browser defaults with a dark background
+- The problem list grid has no visual interest — every card looks identical regardless of content
+- Spacing is inconsistent and elements crowd each other
+
+### 7.2 — Design Inspirations
+
+Take inspiration from:
+
+- **Linear.app** — ultra-clean dark UI, excellent spacing, clear type hierarchy
+- **Vercel Dashboard** — dark panel system, subtle borders, excellent status indicators
+- **Raycast** — sharp typography, perfect use of color as semantic signal
+- **Codeforces profile** reimagined — data-dense but visually calm
+- **GitHub contribution heatmap** — elegant data visualization
+
+### 7.3 — Color Tokens (Use These Exactly)
+
+```css
+/* Background layers — distinct depth levels */
+--bg-base: #070810; /* page background */
+--bg-surface: #0d0f1a; /* card background */
+--bg-elevated: #13162a; /* modal / elevated card */
+--bg-overlay: #1a1d32; /* hover state, selected row */
+--bg-input: #0a0c18; /* form inputs */
+
+/* Borders */
+--border-faint: rgba(255, 255, 255, 0.05);
+--border-subtle: rgba(255, 255, 255, 0.09);
+--border-strong: rgba(255, 255, 255, 0.16);
+--border-cyan: rgba(0, 230, 255, 0.35);
+--border-purple: rgba(139, 92, 246, 0.35);
+
+/* Accent colors — use deliberately, not everywhere */
+--cyan: #00e5ff; /* primary CTA, links, active state */
+--purple: #8b5cf6; /* secondary accent, gradients */
+--green: #22c55e; /* solved status, success */
+--amber: #f59e0b; /* tried status, warning */
+--red: #ef4444; /* error, delete, hard difficulty */
+
+/* Text hierarchy */
+--text-primary: #f1f3f9; /* headings, important values */
+--text-secondary: #b0b8d1; /* body text, labels */
+--text-muted: #6b7799; /* placeholder, metadata, timestamps */
+--text-disabled: #3d4460; /* disabled states */
+```
+
+### 7.4 — Typography Rules
+
+- **Import**: `Inter` (body) + `JetBrains Mono` (code, IDs, tags) from Google Fonts
+- **Scale**:
+  - Page title: `1.75rem`, `font-weight: 800`, `letter-spacing: -0.03em`
+  - Section heading: `1.1rem`, `font-weight: 700`
+  - Card title: `0.95rem`, `font-weight: 600`
+  - Body: `0.875rem`, `font-weight: 400`, `line-height: 1.6`
+  - Label/Meta: `0.75rem`, `font-weight: 500`, `letter-spacing: 0.02em`, color: `var(--text-muted)`
+  - Monospace pill (tag, ID): `0.72rem`, font: `JetBrains Mono`
+- **Never use** default browser font or `font-weight: 400` for headings
+
+### 7.5 — Component Specification
+
+#### Cards (Problem Cards)
+
+```
+- Background: var(--bg-surface)
+- Border: 1px solid var(--border-faint)
+- Border-radius: 10px
+- Padding: 18px 20px
+- Left accent bar: 3px solid (green for solved, amber for tried) — use border-left, not a separate div
+- On hover: border-color → var(--border-subtle), background → var(--bg-overlay), translateY(-1px)
+- Box-shadow on hover: 0 4px 24px rgba(0,0,0,0.4)
+- Transition: all 0.18s ease
+```
+
+#### Buttons
+
+```
+Primary (CTA):
+  - Background: linear-gradient(135deg, #00e5ff, #8b5cf6)
+  - Color: #070810 (dark text on bright button)
+  - Font-weight: 700
+  - Border-radius: 8px
+  - Padding: 9px 20px
+  - Box-shadow: 0 0 16px rgba(0, 229, 255, 0.3)
+  - Hover: brightness(1.1), translateY(-1px), shadow increases
+
+Secondary:
+  - Background: transparent
+  - Border: 1px solid var(--border-subtle)
+  - Color: var(--text-secondary)
+  - Hover: background → var(--bg-overlay), border-color → var(--border-strong)
+
+Danger (delete):
+  - Background: rgba(239, 68, 68, 0.1)
+  - Border: 1px solid rgba(239, 68, 68, 0.3)
+  - Color: #f87171
+  - Hover: background → rgba(239, 68, 68, 0.2)
+```
+
+#### Form Inputs
+
+```
+- Background: var(--bg-input)
+- Border: 1px solid var(--border-subtle)
+- Border-radius: 8px
+- Padding: 10px 14px
+- Font: inherit, 0.875rem
+- Color: var(--text-primary)
+- Placeholder color: var(--text-disabled)
+- Focus: border-color → var(--cyan), box-shadow: 0 0 0 3px rgba(0,229,255,0.12)
+- Transition: border-color 0.15s, box-shadow 0.15s
+- Select arrows: styled, not browser default (use appearance: none + custom SVG arrow)
+```
+
+#### Status Badges
+
+```
+Solved:  background: rgba(34,197,94,0.12), color: #4ade80, border: 1px solid rgba(34,197,94,0.25)
+Tried:   background: rgba(245,158,11,0.12), color: #fbbf24, border: 1px solid rgba(245,158,11,0.25)
+Easy:    background: rgba(34,197,94,0.1),  color: #86efac, border: 1px solid rgba(34,197,94,0.2)
+Medium:  background: rgba(251,191,36,0.1), color: #fcd34d, border: 1px solid rgba(251,191,36,0.2)
+Hard:    background: rgba(239,68,68,0.1),  color: #fca5a5, border: 1px solid rgba(239,68,68,0.2)
+All badges: padding: 2px 8px, border-radius: 5px, font-size: 0.72rem, font-weight: 600
+```
+
+#### Header
+
+```
+- Background: rgba(7, 8, 16, 0.85) with backdrop-filter: blur(20px)
+- Border-bottom: 1px solid var(--border-faint)
+- Position: sticky, top: 0, z-index: 100
+- Height: 60px
+- Contains: Logo (gradient text) | Spacer | User badge | Settings icon | Logout icon
+- NO separate "Add" button in header. Add button lives in the content area.
+```
+
+#### Modals
+
+```
+- Overlay: rgba(0, 0, 0, 0.7) with backdrop-filter: blur(12px)
+- Panel: var(--bg-elevated), border: 1px solid var(--border-subtle)
+- Border-radius: 14px
+- Max-width: 520px, width: 100%
+- Padding: 28px
+- Box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6)
+- Close button: top-right, icon only, hover: color → var(--text-primary)
+- Appear animation: fadeIn + translateY(8px → 0) over 0.2s
+```
+
+### 7.6 — Spacing System
+
+Use a consistent 4px base unit:
+
+- `4px` — tight (icon gap, badge padding)
+- `8px` — compact (button icon gap, input icon offset)
+- `12px` — small (between related elements)
+- `16px` — medium (card padding top/bottom, section gap)
+- `20px` — card padding horizontal
+- `24px` — between cards in grid, modal padding
+- `32px` — section gap
+- `48px` — page section separation
+
+### 7.7 — Layout Rules
+
+- Max content width: `1320px`, centered with `margin: 0 auto`
+- Problem grid: `grid-template-columns: repeat(auto-fill, minmax(360px, 1fr))`
+- Sidebar (future): 260px fixed, content fills remaining space
+- All modals: centered in overlay, max-height: 90vh with `overflow-y: auto`
+- Responsive: below 768px → single column grid, simplified header
+
+### 7.8 — Micro-animations (Required)
+
+- Button hover: `translateY(-1px)` + shadow increase — `0.15s ease`
+- Card hover: `translateY(-2px)` + border brightens — `0.18s ease`
+- Modal open: `opacity 0→1` + `translateY(12px→0)` — `0.2s ease-out`
+- Toast appear: `slideInRight` from 40px — `0.25s ease`
+- Input focus: border + shadow change — `0.15s ease`
+- Status badge pulse (optional): subtle glow keyframe animation on solved badges
+- **No** heavy animations, no rotation, no scale > 1.02, no 3D transforms
+
+### 7.9 — Things to NEVER Do
+
+- Never use plain white (`#ffffff`) anywhere
+- Never use `background: black` — always use dark tokens with blue undertone
+- Never use `font-size: 16px` for labels (too big)
+- Never put a green button next to a red button without visual separation
+- Never let a card have no visual hierarchy (every card must have a title, at least one badge, and an action)
+- Never use border-radius > 14px on panels or > 10px on cards
+- Never use `box-shadow: none` — every elevated surface must cast at least a subtle shadow
+- Never use inline styles for colors — always reference CSS variables
 
 ---
 
-## 🚀 8. Step-by-Step Implementation Roadmap
+## 8. Feature Specifications
+
+### Feature 1 — Problem Tracker (Dual Workspace)
+
+- Filter bar: Status (All/Solved/Tried), Platform, Difficulty, Search text
+- Grid layout: Solved cards have green left border, Tried cards have amber left border
+- Card shows: Platform badge, Difficulty badge, Status badge, Title, brief note, tags, Verdict link, Edit/Delete actions
+- Empty state: centered icon + descriptive message, not just blank space
+
+### Feature 2 — Submission URL Validator
+
+- One submit button only — "Add Problem" opens modal, validation runs on submit
+- Debounced live validation as user types URL (300ms delay)
+- Auto-detects platform from URL domain — shows ⚡ Auto-detected badge
+- Platforms with no shareable submission links (GFG, HackerRank) → accept any valid HTTPS URL
+- Platform dropdown glows cyan when auto-detected; manual change removes glow/badge
+
+### Feature 3 — Streak Engine (Phase 2)
+
+- Configurable `N` problems/day — default 2
+- Daily count resets at midnight in user's timezone
+- Streak HUD in header: `🔥 7 | 2/3 today`
+- Progress bar: thin bar below header, fills cyan as today's count approaches target
+
+### Feature 4 — LeetCode Sync (Phase 2)
+
+- Button triggers `POST /sync/leetcode` — spinner while loading
+- Shows last synced timestamp after completion
+- Newly synced problems appear in the problem grid immediately
+- Deduplication — same submission never added twice
+
+### Feature 5 — Analytics (Phase 3)
+
+- Monthly bar chart: Jan–Dec, click any bar to drilldown
+- Line chart defaults to current month, updates on bar click
+- Metrics: Daily solved count, cumulative solved, current streak, weekly pace
+- Heatmap: GitHub-style contribution grid, color intensity = volume
+
+---
+
+## 9. File & Folder Structure
 
 ```text
-Phase 1: Backend Foundation & Lean DB (FastAPI + Async Motor)
-├── 1.1 Create FastAPI app structure with CMD-compatible scripts.
-├── 1.2 Setup Async Motor connection with indexes on user_id, date, status, month.
-├── 1.3 Implement lean Pydantic models (<350 bytes footprint).
-├── 1.4 Build strict Multi-Platform Submission URL Regex Validator.
-<<<<<<< HEAD
-├── 1.5 Implement the DB connection.
-├── 1.6 Implement the CRUD operations of users and problems.
-├── 1.7 Implement User Authentication(login, logout, register, isLoggedIn).
-├── 1.8 Implement proper error handling for the above implementation using try-except blocks.
-
-
-
-
-=======
->>>>>>> 1bee731a474e37c2e8fde614a3d99ec1f5c7498b
-
-Phase 2: LeetCode Engine & Streak Calculator
-├── 2.1 Implement async LeetCode GraphQL fetcher for user submissions.
-├── 2.2 Build auto-classification & deduplication pipeline.
-├── 2.3 Implement Streak Calculator (Target N validation, daily rollups, month aggregation).
-
-Phase 3: Analytics & Agentic Telemetry Endpoints
-├── 3.1 Implement /analytics/monthly-volume and /analytics/progress-timeline (with month filtering).
-├── 3.2 Implement /agent/telemetry hooks for future AI agent integrations.
-
-Phase 4: Frontend Development (React + Vite + Recharts)
-├── 4.1 Scaffold React app with futuristic dark/neon glassmorphism design.
-├── 4.2 Build Monthly Bar Chart with interactive month click-event drilldown.
-├── 4.3 Build Progress Line Graph updating dynamically on month selection.
-├── 4.4 Build Solved Archive & Tried Lab workspace tables with drawer modals.
-├── 4.5 Build Submission Ingestion Modal with live URL validation feedback.
-
-Phase 5: Verification & Testing
-├── 5.1 Run all test suites and verify via Command Prompt (cmd.exe).
-├── 5.2 Validate LeetCode sync, invalid URL rejection, and month drilldown graphs.
+d:\python projects\test\
+├── plan.md                    ← This file (source of truth)
+├── phase_implementation.md    ← What/How/Why for each phase
+├── .gitignore
+├── README.md
+│
+├── backend\
+│   ├── .env                   ← Never commit. Contains MONGO_URL, JWT_SECRET
+│   ├── .env.example           ← Safe template to commit
+│   ├── main.py                ← FastAPI app entry point with lifespan
+│   ├── requirements.txt
+│   ├── setup_backend.bat      ← pip install -r requirements.txt (cmd.exe)
+│   ├── start_backend.bat      ← uvicorn main:app --reload (cmd.exe)
+│   └── app\
+│       ├── core\
+│       │   ├── config.py      ← Read .env settings
+│       │   ├── database.py    ← Async Motor connection pool + indexes
+│       │   └── security.py    ← bcrypt + JWT helpers
+│       ├── models\
+│       │   └── schemas.py     ← Pydantic models (lean, < 350 bytes)
+│       ├── services\
+│       │   ├── validator.py   ← Submission URL regex engine
+│       │   └── (streak.py, leetcode_sync.py added in Phase 2)
+│       └── api\
+│           ├── deps.py        ← get_current_user dependency
+│           ├── auth.py        ← /auth routes
+│           ├── users.py       ← /users routes
+│           ├── problems.py    ← /problems routes
+│           └── validator.py   ← /validate routes
+│
+└── frontend\
+    ├── index.html
+    ├── vite.config.js
+    ├── package.json
+    ├── setup_frontend.bat     ← npm install (cmd.exe)
+    ├── start_frontend.bat     ← npm run dev (cmd.exe)
+    └── src\
+        ├── main.jsx           ← App entry
+        ├── App.jsx            ← Root: auth state, routing, toast
+        ├── api\
+        │   └── client.js      ← Centralized API client with Bearer injection
+        ├── styles\
+        │   └── index.css      ← Full design system (CSS variables, components)
+        └── components\
+            ├── Header.jsx
+            ├── AuthView.jsx
+            ├── ProblemCRUD.jsx
+            ├── ProfileModal.jsx
+            ├── ValidatorPlayground.jsx
+            └── (StreakHUD.jsx, SyncButton.jsx added in Phase 2)
 ```
-
----
-
-## ❓ 9. User Verification & Approval
-This plan integrates all your constraints (Command Prompt only, 512MB free tier ultra-lean data model, future AI agent telemetry readiness, futuristic lightweight UI, and interactive monthly bar + drilldown line graphs).
-
-Please review the updated plan! When you are ready, approve and we will begin Phase 1.

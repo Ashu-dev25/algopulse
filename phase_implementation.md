@@ -8,9 +8,9 @@
 | :--- | :--- | :--- | :--- |
 | **Phase 1** | **Backend Core, Auth, User & Problem CRUD, Strict URL Validator + Phase 1 Client UI** | **Backend**: FastAPI, MongoDB Async, JWT Auth, User & Problem CRUD, URL Proof Validator.<br>**Frontend**: Sleek Cyberpunk UI, Register/Login views, Problem CRUD workspace with live URL validation, User Profile modal, and Interactive Validator Playground. | 🟡 **Active & Ready for Full-Stack Testing** |
 | **Phase 2** | **LeetCode Sync Engine & Streak Engine + Sync UI** | **Backend**: LeetCode GraphQL fetcher, timezone timestamp mapping, deduplication, streak target $N$ engine.<br>**Frontend**: LeetCode sync button with status indicators, Streak HUD counter, live target progress bar. | ⚪ Pending Phase 1 Validation |
-| **Phase 3** | **Interactive Analytics & Progress Graphs + Analytics UI** | **Backend**: Monthly volume aggregator, progress timeline drilldown.<br>**Frontend**: Monthly Volume Bar Chart (click-to-drilldown), Multi-Metric Progress Line Chart, 6-Month Heatmap. | ⚪ Pending Phase 2 Validation |
-| **Phase 4** | **Agentic AI Telemetry Layer & Coach Assistant** | **Backend**: `/agent/telemetry/patterns`, topic decay analysis.<br>**Frontend**: AI recommendation panel and revision reminders. | ⚪ Pending Phase 3 Validation |
-| **Phase 5** | **End-to-End Testing & Final Production Polish** | Comprehensive test suites, security checks, production build verification. | ⚪ Pending Phase 4 Validation |
+| **Phase 3** | **Command-Driven Analytics & Agentic CRUD Intake** | **Backend**: period-scoped analytics, natural-language intent parsing, clarification state, validator-backed problem creation and CRUD actions.<br>**Frontend**: command console, clarification prompts, current week/month analytics views. | ⚪ Pending Phase 2 Validation |
+| **Phase 4** | **Learning Coach, Revision Agent & Notifications** | **Backend**: evidence-grounded habit analysis, tried-topic weakness detection, spaced-revision scheduler, recommendation queue, notification preferences.<br>**Frontend**: learning analysis, revision sheet, recommendation explanations, due notifications. | ⚪ Pending Phase 3 Validation |
+| **Phase 5** | **Agent Evaluation, Reliability & Production Polish** | Agent evals, guardrails, auditability, end-to-end tests, security checks, notification delivery tests, and production build verification. | ⚪ Pending Phase 4 Validation |
 
 ---
 
@@ -57,26 +57,15 @@
 4. **`components/ProfileModal.jsx`**: Manage LeetCode handle, daily target $N$, timezone, and delete account.
 5. **`components/ValidatorPlayground.jsx`**: Dedicated test lab with 1-click test samples to verify that bare problem links are rejected and submission proofs are accepted.
 
----
 
 ## 2. How and Why Each Component Was Built
 
 ### 🔹 1. Frontend-Backend Token Flow
-- **WHAT**: JWT Bearer token stored in browser `localStorage` and sent in the HTTP `Authorization` header.
-- **HOW**: `api/client.js` automatically checks for stored token, attaches `Authorization: Bearer <token>`, and handles 401 token expiry by resetting to the Login view.
-- **WHY**: Works seamlessly in modern browsers without cookie domain or CORS issues, and maintains login state across page reloads.
 
 ### 🔹 2. Live URL Validation in Frontend
-- **WHAT**: As the user types or pastes a link into the "Add Problem" modal or "Validator Playground", the client calls `/api/v1/validate/submission-url`.
-- **HOW**: The backend regex engine checks if the URL matches a valid verdict/submission proof path (e.g. `codeforces.com/contest/1800/submission/...`) and rejects generic problem links (e.g. `codeforces.com/problemset/problem/1800/E`).
-- **WHY**: Provides immediate visual feedback to the user before they submit the form.
 
 ### 🔹 3. 512MB MongoDB Optimization
-- **WHAT**: Average document size kept below 350 bytes.
-- **HOW**: Storing external URLs and short notes instead of multi-megabyte raw code and editorial text.
-- **WHY**: Guarantees that MongoDB's 512MB free tier can store 1,000,000+ problem logs without running out of disk space.
 
----
 
 ## 3. How to Test Phase 1 (Command Prompt)
 
@@ -89,10 +78,7 @@ start_phase1.bat
 *(If first time running, run `setup_phase1.bat` first to install Python & npm dependencies)*.
 
 This opens:
-- 🌐 **Frontend UI Client**: [http://localhost:3000](http://localhost:3000)
-- 🔌 **Backend API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 
----
 
 ### Option B: Interactive Client Testing Steps
 1. Open **`http://localhost:3000`** in your browser.
@@ -105,6 +91,86 @@ This opens:
    - Click **"URL Validator"** in the top bar to open the testing playground and click sample links.
    - Click the **Settings icon** $\rightarrow$ Update daily target $N$ or test account deletion.
    - Click **Logout** $\rightarrow$ Verify session cleanup.
+
+
+---
+
+# Phase 3: Command-Driven Analytics & Agentic CRUD Intake
+
+> Status: Pending Phase 2 browser validation
+
+## What to build
+
+- Add `POST /api/v1/agent/command` for add, list, update, delete, and week/month analysis requests.
+- Keep CRUD, URL validation, and analytics services as the source of truth. The model may choose an intent and extract fields, but it must not query MongoDB or mutate records directly.
+- For `add <problem link>`, validate the link, detect the platform, collect missing title/status/difficulty/tags, show a preview, and require confirmation before creating the normal problem record.
+- For update and delete requests, return matching candidates and require an explicit record choice and confirmation before mutation.
+- Resolve current calendar week/month boundaries in the user's timezone and return exact dates, solved/tried totals, daily activity, and platform counts.
+
+## How to build it
+
+1. Define Pydantic schemas for intents, slots, clarification questions, confirmation previews, and typed results.
+2. Implement an orchestration service that calls narrow server-owned tools for validation, candidate lookup, analytics, and confirmed CRUD.
+3. Store only resumable clarification state in `agent_conversations`, with a TTL index; do not store full prompts or transcripts by default.
+4. Add command-console states for loading, clarification, confirmation, validation errors, retry, and model unavailability.
+
+## Exit checks
+
+- Complete and incomplete `add <link>` commands work.
+- Generic problem links are rejected by the existing validator.
+- Update and delete never execute without confirmation.
+- Week/month analytics use calendar boundaries in the user's timezone.
+- Fixed CRUD and analytics endpoints work when the model is unavailable.
+
+---
+
+# Phase 4: Learning Coach, Revision Agent & Notifications
+
+> Status: Pending Phase 3 validation
+
+## What to build
+
+- Preserve attempts, first-attempt time, solved transition time, normalized tags, and `stuck_category` in problem telemetry.
+- Add `analyse my current learning`, learning evidence, due revision, and review endpoints.
+- Score tried problems using recency, repeated attempts, unresolved status, failure category, supported weak tags, and overdue reviews.
+- Create compact `revision_items` records using 1, 3, 7, 14, and 30-day intervals, adjusted by `again`, `hard`, `good`, or `easy` review results.
+- Include solved problems only when their review is due or they reinforce a weak topic. Recommendations must include source IDs and state when evidence is insufficient.
+- Add idempotent in-app notifications and notification preferences.
+
+## How to build it
+
+1. Produce deterministic evidence and candidate IDs before invoking the model.
+2. Give the model aggregated evidence only; it may explain and rank candidates but cannot invent facts or write to the database.
+3. Group the revision sheet into due today, upcoming, and recently completed, with reasons and a mark-reviewed action.
+4. Create due notifications once per revision item through a retryable background mechanism.
+
+## Exit checks
+
+- Repeated failures rank above isolated failures in fixture tests.
+- Recommendations contain source IDs, evidence counts, reason codes, and review dates.
+- Missing tags do not become invented weaknesses.
+- Revision and notification queries are user-scoped and idempotent.
+
+---
+
+# Phase 5: Agent Evaluation, Reliability & Production Polish
+
+> Status: Pending Phase 4 validation
+
+## What to build
+
+- Add offline eval fixtures for intent detection, missing-field extraction, timezone ranges, platform summaries, CRUD confirmation, and revision ranking.
+- Test prompt injection in URLs/notes, malformed model output, unsupported commands, timeouts, duplicate commands, model outages, and partial notification failures.
+- Enforce Pydantic or Guardrails validation before tool calls, plus request limits, model timeouts, rate limits, token budgets, and redacted audit logs.
+- Verify MongoDB indexes and TTL cleanup, frontend production build, accessibility, mobile layouts, and browser flows.
+
+## Exit checks
+
+- Agent eval results meet agreed thresholds and regressions are tracked.
+- Unauthorized data access and unconfirmed mutations are rejected.
+- Due notifications are idempotent and retried safely.
+- Secrets and sensitive user data are absent from logs and traces.
+- CRUD and fixed analytics fallbacks pass during model outages.
 
 
 

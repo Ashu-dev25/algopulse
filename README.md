@@ -10,11 +10,9 @@
 - **🔥 Smart Daily Streak Engine**: User-configurable target $N$ problems/day with real-time progress HUD and activity heatmaps.
 - **⚡ Automated LeetCode Ingestion**: Public GraphQL sync with exact timestamp attribution and deduplication.
 - **🛡️ Strict Multi-Platform Proof Validator**: Validates submission URLs (Codeforces, CodeChef, GFG, AtCoder, HackerRank) and rejects generic problem links.
-- **📊 Interactive Analytics & Monthly Drilldown**:
-  - Monthly Volume Bar Chart with interactive click-to-filter.
-  - Multi-metric Progress Line Graph (Current Streak, Longest Streak, Cumulative Solved, Weekly Pace) dynamically syncing to the selected month.
-- **🗄️ 512MB MongoDB Free-Tier Optimization**: Ultra-lean models (<350 bytes/doc) for storing 1,000,000+ problem logs without database bloat.
-- **🤖 Agentic AI Telemetry Layer**: Built-in `/api/v1/agent/` hooks for future autonomous productivity coaching agents.
+- **📊 Period-Scoped Analytics**: Current week/month summaries with exact date ranges, daily activity, and per-platform solved counts.
+- **🤖 Agentic Workflow Roadmap**: Prompt-driven CRUD, clarification and confirmation flows, learning analysis, spaced revision, and due notifications from Phase 3 onward.
+- **🤖 Agentic AI Layer**: Phase 3+ command intake, validator-backed CRUD, period analysis, learning analysis, revision recommendations, and notifications.
 
 ---
 
@@ -30,4 +28,5 @@
 ## 📋 Project Documentation
 
 - Detailed architecture, schemas, and API contracts: [`plan.md`](./plan.md)
+- Agentic AI prerequisites and readiness criteria: [`agentic_prerequisites.md`](./agentic_prerequisites.md)
 - Environment diagnostic tool: [`check_prerequisites.bat`](./check_prerequisites.bat)
