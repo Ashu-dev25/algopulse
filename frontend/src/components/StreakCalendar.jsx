@@ -26,12 +26,17 @@ export default function StreakCalendar({ refreshKey = 0, days = 365 }) {
   }, [days, refreshKey]);
 
   return (
-    <section className="activity-calendar" aria-label="Solved and tried activity history">
+    <section
+      className="activity-calendar"
+      aria-label="Solved and tried activity history"
+    >
       <div className="activity-calendar-header">
         <div>
           <span className="label">Consistency</span>
           <h2>Daily activity</h2>
-          <p className="activity-calendar-source">Based only on AlgoPulse activity</p>
+          <p className="activity-calendar-source">
+            Based only on AlgoPulse activity
+          </p>
         </div>
         <CalendarDays size={19} color="var(--cyan)" />
       </div>

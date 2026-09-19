@@ -544,7 +544,10 @@ export default function ProblemCRUD({
                   {/* Edit / Delete */}
                   <div style={{ display: "flex", gap: "6px" }}>
                     {!isSolved && (
-                      <div className="frequency-control" aria-label="Revision frequency">
+                      <div
+                        className="frequency-control"
+                        aria-label="Revision frequency"
+                      >
                         <button
                           type="button"
                           className="frequency-button"

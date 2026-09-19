@@ -5,6 +5,8 @@ This document defines what must be available before AlgoPulse moves from the Pha
 ## 1. Product Contracts
 
 - Phase 1-2 CRUD and URL validation remain usable without an LLM.
+- LeetCode sync imports accepted activity only; tried revision records are manually created and frequency-adjustable.
+- Daily targets use unique solved plus tried AlgoPulse activity, not external platform totals.
 - Supported command intents are explicit: add, list, update, delete, analyse week/month, and analyse current learning.
 - Mutating commands show a typed preview and require confirmation after all missing fields are collected.
 - Analytics always states the exact date range and user's timezone.
@@ -16,6 +18,7 @@ This document defines what must be available before AlgoPulse moves from the Pha
 - Python 3.11+, FastAPI, Pydantic v2, Motor, MongoDB, JWT authentication, and React/Vite are installed and working.
 - Phase 1 tests pass and Phase 2 sync/streak behavior is verified before Phase 3 begins.
 - Every problem has reliable `user_id`, status, platform, timestamps, tags, attempts, and `stuck_category` values where known.
+- Tried records include a manual revision frequency and are the only long-term revision candidates created by sync-independent user input.
 - The user's timezone is valid and used for all week/month boundaries and notification scheduling.
 - MongoDB indexes and the 512MB storage constraint are reviewed before adding new collections.
 

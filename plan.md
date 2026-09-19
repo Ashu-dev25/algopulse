@@ -22,15 +22,15 @@
 
 ## 1. Project Overview
 
-| Feature                     | Description                                                                                     |
-| :-------------------------- | :---------------------------------------------------------------------------------------------- |
-| **Dual Workspaces**         | 🟢 **Today's Activity** + 🟠 **Tried & Unsolved Lab** with manual revision frequency            |
-| **Streak Engine**           | User-configurable daily target $N$. Auto-evaluates at midnight in user timezone                 |
-| **LeetCode Sync**           | On-demand GraphQL sync with deduplication and timezone-correct date attribution                 |
-| **URL Validator**           | Strict regex proof-URL checker. Rejects generic problem links. Auto-detects platform            |
-| **Analytics**               | Current week/month summaries with exact date ranges, daily activity, and platform counts        |
-| **MongoDB 512MB Optimized** | All documents < 350 bytes. Links replace blobs                                                  |
-| **Agentic Workflow**        | Prompt-driven CRUD, clarification, confirmation, learning analysis, revision, and notifications |
+| Feature                     | Description                                                                                       |
+| :-------------------------- | :------------------------------------------------------------------------------------------------ |
+| **Dual Workspaces**         | 🟢 **Today's Activity** + 🟠 **Tried & Unsolved Lab** with manual revision frequency              |
+| **Streak Engine**           | User-configurable daily target $N$. Auto-evaluates at midnight in user timezone                   |
+| **LeetCode Sync**           | Automatic/manual GraphQL sync for accepted activity with deduplication and timezone-correct dates |
+| **URL Validator**           | Strict regex proof-URL checker. Rejects generic problem links. Auto-detects platform              |
+| **Analytics**               | Current week/month summaries with exact date ranges, daily activity, and platform counts          |
+| **MongoDB 512MB Optimized** | All documents < 350 bytes. Links replace blobs                                                    |
+| **Agentic Workflow**        | Prompt-driven CRUD, clarification, confirmation, learning analysis, revision, and notifications   |
 
 ---
 
@@ -188,10 +188,10 @@ const handleCreateProblem = async (e) => {
   - Auto-converts Unix timestamps to user timezone (e.g. `Asia/Kolkata`)
   - Anti-bleed: submission at `23:30 yesterday` is dated yesterday, not today
   - Deduplication via unique submission index `(user_id, sub_id)`
-  - `Accepted` → current-day activity, everything else → tried history
+  - `Accepted` → current-day activity; non-accepted submissions are ignored by sync
 - `app/services/streak_engine.py` — Daily streak calculator
-  - Reads today's unique solved activity from `daily_activity` and writes the aggregate to `daily_streaks`
-  - Increments `current_streak` if `solved_count >= daily_target`
+  - Combines today's unique solved activity with manually added tried records
+  - Increments `current_streak` if total unique daily activity meets `daily_target`
   - Resets streak to 0 if missed day; updates `longest_streak` if new record
 - `app/api/sync.py` — `POST /sync/leetcode`, `GET /sync/status`
 - `app/api/streak.py` — `GET /streak/overview`, `GET /streak/heatmap`
@@ -200,7 +200,8 @@ const handleCreateProblem = async (e) => {
 **Frontend:**
 
 - `components/StreakHUD.jsx` — Streak pill: `🔥 7 Days | Today 2/3 ◻◻◼`
-- `components/SyncButton.jsx` — LeetCode sync trigger with spinner + last-synced timestamp
+- `components/SyncButton.jsx` — automatic-on-load and manual LeetCode sync with spinner + last-synced timestamp
+- `components/StreakCalendar.jsx` — daily solved/tried/total activity calendar
 - Progress bar in Header showing today's `solved / target`
 
 ---

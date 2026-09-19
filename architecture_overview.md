@@ -72,6 +72,8 @@ MongoDB stores lean user-scoped records. It does not store raw model transcripts
 - **Deterministic core**: facts, scores, date ranges, and writes are reproducible without an LLM.
 - **User scoping**: every query and tool call applies the authenticated user ID.
 - **Idempotency**: repeated commands and notification jobs do not create duplicate records.
+- **Activity separation**: accepted sync activity is stored for the current day; tried history is created manually for revision work.
+- **Combined target accounting**: solved and tried AlgoPulse records count toward daily activity, while their breakdown remains visible.
 
 ## 5. Recommended Technology Roles
 

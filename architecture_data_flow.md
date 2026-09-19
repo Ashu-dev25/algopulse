@@ -50,6 +50,30 @@ Example command: `add https://example.com/submission/123`
 
 No database write occurs before step 10.
 
+## 2.1 Phase 2 Activity and Sync Flow
+
+The dashboard runs the same sync workflow automatically on load when a LeetCode handle is configured. The user can also trigger it manually.
+
+```mermaid
+flowchart LR
+  LOAD[Dashboard load or Sync button] --> STATUS[GET sync status]
+  STATUS -->|handle configured| LC[LeetCode recent submissions]
+  STATUS -->|no handle| MANUAL[Add handle in profile]
+  LC --> FILTER[Keep accepted submissions only]
+  FILTER --> ACT[daily_activity]
+  ACT --> STREAK[Streak calculation]
+  STREAK --> HUD[HUD and calendar refresh]
+```
+
+Non-accepted LeetCode submissions are not written to tried history. A tried record enters the application only through the manual Add Problem flow.
+
+Daily target progress uses unique activity from both sources:
+
+- Accepted activity in `daily_activity`.
+- Manually added tried records in `problems` using `last_attempt_local_date`.
+
+The streak service keeps solved and tried counts separate, then uses their unique combined total for target completion.
+
 ## 3. Analytics Flow
 
 Example commands: `analyse my current week` or `analyse my current month`
@@ -119,13 +143,14 @@ The state is persisted only when resumption is needed. Raw prompts and full tran
 
 ## 6. Data Ownership
 
-| Data                        | Owner                | Agent access                                        |
-| --------------------------- | -------------------- | --------------------------------------------------- |
-| User identity and timezone  | Auth/user services   | Read through typed tool                             |
-| Problem records             | CRUD service         | Read candidates; write only after confirmation tool |
-| Week/month totals           | Analytics service    | Read typed aggregate                                |
-| Weak-topic evidence         | Learning service     | Read aggregate and candidate IDs                    |
-| Review dates                | Revision scheduler   | Request scheduling through typed tool               |
-| Notification delivery state | Notification service | Request creation/read status through typed tool     |
+| Data                        | Owner                        | Agent access                                        |
+| --------------------------- | ---------------------------- | --------------------------------------------------- |
+| User identity and timezone  | Auth/user services           | Read through typed tool                             |
+| Problem records             | CRUD service                 | Read candidates; write only after confirmation tool |
+| Daily solved activity       | Sync/manual activity service | Read for today's view, calendar, and streak input   |
+| Week/month totals           | Analytics service            | Read typed aggregate                                |
+| Weak-topic evidence         | Learning service             | Read aggregate and candidate IDs                    |
+| Review dates                | Revision scheduler           | Request scheduling through typed tool               |
+| Notification delivery state | Notification service         | Request creation/read status through typed tool     |
 
 Agents never bypass these owners.

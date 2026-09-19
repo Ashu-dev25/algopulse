@@ -509,13 +509,11 @@ Finds a MongoDB ObjectId together with the authenticated user ID. Invalid IDs an
 
 Deletes only the matching user-owned problem and returns a success message. Missing or invalid records return HTTP 404.
 
-### Current limitations requiring Phase 2/4 correction
+### Current limitations and future work
 
-- The create path uses `$set` with `upsert=True`; a repeated problem can reset `attempts` to 1 instead of incrementing it.
-- The update path sets `solved_at` when a status is solved but does not explicitly preserve an immutable first solve timestamp or clear it on a transition back to tried.
-- `datetime.now()` is naive; future analytics and streak calculations must normalize timestamps and use the user’s timezone for calendar boundaries.
-- A frontend option named `need_algorithm` is not present in `StuckCategoryEnum`, which can produce a schema validation error when submitted.
+- LeetCode sync currently uses the recent public submission window; full lifetime attempt history would require paginated or authenticated history access.
 - Tags and stuck categories are trimmed but not yet normalized for consistent learning aggregation.
+- Week/month analytics and agentic CRUD remain planned for Phase 3.
 
 ---
 
@@ -955,8 +953,8 @@ Phase 2 is implemented in the current codebase and requires browser validation a
 
 ## Backend files
 
-- `app/services/leetcode_sync.py`: Fetches recent LeetCode submissions through GraphQL, stores timestamps in UTC, maps them to local dates, classifies accepted submissions as solved and other results as tried, and deduplicates source submissions through the `submissions` collection.
-- `app/services/streak_engine.py`: Records compact current-day activity, migrates legacy solved records, combines solved activity with manually added tried records, compares unique daily activity against the target, and updates current/longest streak values.
+- `app/services/leetcode_sync.py`: Fetches recent LeetCode submissions through GraphQL, stores accepted submissions as current-day activity, ignores non-accepted submissions, stores timestamps in UTC, maps them to local dates, and deduplicates accepted source submissions through the `submissions` collection.
+- `app/services/streak_engine.py`: Records compact current-day solved activity, migrates legacy solved records, combines it with manually added tried records, compares unique daily activity against the target, and updates current/longest streak values.
 - `app/api/sync.py`: Exposes `POST /sync/leetcode` and `GET /sync/status`.
 - `app/api/streak.py`: Exposes `GET /streak/overview` and `GET /streak/heatmap`.
 
@@ -971,7 +969,7 @@ Phase 2 is implemented in the current codebase and requires browser validation a
 ## Frontend files
 
 - `StreakHUD.jsx`: Loads and displays current streak, daily target progress, and target state.
-- `SyncButton.jsx`: Loads sync status, disables itself without a LeetCode handle, starts sync, displays errors/last-sync time, and refreshes the dashboard after success.
+- `SyncButton.jsx`: Loads sync status, automatically syncs on dashboard load when a LeetCode handle exists, supports manual sync, displays errors/last-sync time, and refreshes the dashboard after success.
 - `App.jsx`: Mounts the Phase 2 toolbar and refreshes problems/streak data after sync.
 - `ProblemCRUD.jsx`: Accepts a refresh key, requests `today` or `tried` views, displays current-day activity separately from tried history, and edits manual revision frequency.
 - `Sidebar.jsx`: Provides navigation between today's activity and the all-time tried-problem workspace.
@@ -990,12 +988,14 @@ Phase 2 is implemented in the current codebase and requires browser validation a
 - `POST /api/v1/sync/leetcode?limit=20` requires the authenticated user's `lc_handle` and imports up to 100 recent submissions.
 - Repeating a sync skips already-seen source submission IDs.
 - Each logical LeetCode problem is stored once and repeated submissions increment `attempts`.
-- An accepted submission is written to current-day activity and removed from long-term tried history; non-accepted submissions remain in tried history.
+- An accepted submission is written to current-day activity and removed from long-term tried history; non-accepted submissions are ignored by sync and must be added manually if they should enter revision history.
 - `GET /api/v1/sync/status` returns whether a handle is configured and the last successful sync time.
 - `GET /api/v1/streak/overview` recalculates and returns current streak, longest streak, target, and today's solved count.
 - `GET /api/v1/streak/heatmap?days=365` returns local-calendar records for the requested window.
 - `GET /api/v1/problems?view=today` returns only today's solved activity plus tried attempts made today.
 - `GET /api/v1/problems?view=tried` returns the all-time tried history, including manual revision frequency.
+- `POST /api/v1/streak/reset-before-today` clears pre-today activity and establishes today as the testing baseline.
+- Daily target progress counts unique solved plus manually added tried problems; the response also exposes solved, tried, and total counts separately.
 
 ---
 

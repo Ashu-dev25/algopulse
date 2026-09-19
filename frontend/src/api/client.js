@@ -121,5 +121,6 @@ export const syncApi = {
 export const streakApi = {
   getOverview: () => apiRequest("/streak/overview"),
   getHeatmap: (days = 365) => apiRequest(`/streak/heatmap?days=${days}`),
-  resetBeforeToday: () => apiRequest("/streak/reset-before-today", { method: "POST" }),
+  resetBeforeToday: () =>
+    apiRequest("/streak/reset-before-today", { method: "POST" }),
 };
