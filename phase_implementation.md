@@ -8,13 +8,13 @@ The implementation status is based on the current files under `backend/` and `fr
 
 ## 1. Current Status
 
-| Phase | Current state | What it contains |
-| --- | --- | --- |
+| Phase   | Current state                                | What it contains                                                                                                           |
+| ------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Phase 1 | Implemented and ready for browser validation | FastAPI app, MongoDB connection, JWT auth, user profile CRUD, problem CRUD, strict submission URL validation, React client |
-| Phase 2 | Planned | LeetCode sync, timezone-aware ingestion, deduplication, streak engine, streak UI |
-| Phase 3 | Planned | Command supervisor, CRUD intake agent, week/month analytics, clarification and confirmation workflows |
-| Phase 4 | Planned | Learning coach, weak-topic analysis, revision scheduler, revision sheet, notifications |
-| Phase 5 | Planned | Multi-agent evaluations, guardrails, reliability, auditability, security, production testing |
+| Phase 2 | Implemented, pending full browser validation | LeetCode sync, timezone-aware ingestion, deduplication, streak engine, streak UI                                           |
+| Phase 3 | Planned                                      | Command supervisor, CRUD intake agent, week/month analytics, clarification and confirmation workflows                      |
+| Phase 4 | Planned                                      | Learning coach, weak-topic analysis, revision scheduler, revision sheet, notifications                                     |
+| Phase 5 | Planned                                      | Multi-agent evaluations, guardrails, reliability, auditability, security, production testing                               |
 
 ### What Phase 1 does today
 
@@ -26,18 +26,19 @@ A user can:
 4. Add a problem using a submission proof URL.
 5. Automatically detect Codeforces, CodeChef, AtCoder, and LeetCode URLs.
 6. Reject generic problem URLs for platforms with strict submission patterns.
-7. Store solved or tried problems with tags, difficulty, notes, and blocker category.
-8. List, filter, edit, and delete their own problems.
-9. Test URL validation in the validator playground.
-10. Delete their account and associated Phase 1 problem/streak records.
+7. Store unresolved/tried problems with tags, difficulty, notes, blocker category, attempts, and manual revision frequency.
+8. Record solved submissions in the current-day activity ledger and include them in today's count.
+9. List today's activity separately from all-time tried history.
+10. Filter, edit, and delete their own tried problems.
+11. Test URL validation in the validator playground.
+12. Delete their account and associated activity, sync, streak, and problem records.
 
 ### What Phase 1 does not do yet
 
 - It does not accept natural-language commands such as `add <problem link>`.
 - It does not ask conversational follow-up questions for missing fields.
 - It does not calculate current week/month analytics.
-- It does not synchronize LeetCode submissions.
-- It does not calculate a daily streak from synced data.
+- LeetCode synchronization and daily streaks are implemented in Phase 2, pending full browser validation.
 - It does not have learning analysis, revision scheduling, or notifications.
 - It does not contain implemented LangChain, LangGraph, Guardrails, or model-provider code.
 
@@ -920,14 +921,14 @@ The expected development URLs are:
 
 ## Existing automated checks
 
-Run the Phase 1 validation script from Command Prompt after dependencies are installed:
+Run all current phase validation scripts from Command Prompt after dependencies are installed:
 
 ```cmd
 cd /d "d:\python projects\test\backend"
-python tests\test_phase1.py
+run_phase_tests.bat
 ```
 
-The repository also contains `backend\test_phase1.bat`, which can be used if it matches the local setup.
+`backend\test_phase1.bat` remains as a compatibility wrapper and now delegates to `run_phase_tests.bat`.
 
 ## Browser checks
 
@@ -948,16 +949,16 @@ The Phase 1 tests are mostly service/schema tests. They do not currently boot th
 
 ---
 
-# 7. Planned Phase 2: Sync and Streak Engine
+# 7. Phase 2: Sync and Streak Engine
 
-Phase 2 is not implemented in the current codebase.
+Phase 2 is implemented in the current codebase and requires browser validation against a configured LeetCode account.
 
-## Backend files to add
+## Backend files
 
-- `app/services/leetcode_sync.py`: Fetch recent LeetCode submissions through GraphQL, convert timestamps using the user timezone, classify accepted submissions as solved and other results as tried, and deduplicate records.
-- `app/services/streak_engine.py`: Aggregate daily solved counts, compare them to the user target, and update current/longest streak values.
-- `app/api/sync.py`: Expose sync and sync-status endpoints.
-- `app/api/streak.py`: Expose streak overview and heatmap endpoints.
+- `app/services/leetcode_sync.py`: Fetches recent LeetCode submissions through GraphQL, stores timestamps in UTC, maps them to local dates, classifies accepted submissions as solved and other results as tried, and deduplicates source submissions through the `submissions` collection.
+- `app/services/streak_engine.py`: Records compact current-day activity, migrates legacy solved records, combines solved activity with manually added tried records, compares unique daily activity against the target, and updates current/longest streak values.
+- `app/api/sync.py`: Exposes `POST /sync/leetcode` and `GET /sync/status`.
+- `app/api/streak.py`: Exposes `GET /streak/overview` and `GET /streak/heatmap`.
 
 ## Required Phase 2 model changes
 
@@ -967,11 +968,14 @@ Phase 2 is not implemented in the current codebase.
 - Normalize timestamps to UTC for storage and convert to the user timezone for day boundaries.
 - Add safe deduplication keys for imported submissions.
 
-## Frontend files to add
+## Frontend files
 
-- `StreakHUD.jsx`: Current streak, longest streak, and daily target progress.
-- `SyncButton.jsx`: Sync action, loading state, last-sync time, and error state.
-- Analytics-ready activity data in the dashboard shell.
+- `StreakHUD.jsx`: Loads and displays current streak, daily target progress, and target state.
+- `SyncButton.jsx`: Loads sync status, disables itself without a LeetCode handle, starts sync, displays errors/last-sync time, and refreshes the dashboard after success.
+- `App.jsx`: Mounts the Phase 2 toolbar and refreshes problems/streak data after sync.
+- `ProblemCRUD.jsx`: Accepts a refresh key, requests `today` or `tried` views, displays current-day activity separately from tried history, and edits manual revision frequency.
+- `Sidebar.jsx`: Provides navigation between today's activity and the all-time tried-problem workspace.
+- `styles/index.css`: Adds responsive streak, progress, sync, and loading styles.
 
 ## Phase 2 exit criteria
 
@@ -980,6 +984,18 @@ Phase 2 is not implemented in the current codebase.
 - A submission near midnight is attributed to the correct local date.
 - Streak calculations pass missed-day and target-met tests.
 - Phase 1 manual CRUD still works.
+
+## Phase 2 API behavior
+
+- `POST /api/v1/sync/leetcode?limit=20` requires the authenticated user's `lc_handle` and imports up to 100 recent submissions.
+- Repeating a sync skips already-seen source submission IDs.
+- Each logical LeetCode problem is stored once and repeated submissions increment `attempts`.
+- An accepted submission is written to current-day activity and removed from long-term tried history; non-accepted submissions remain in tried history.
+- `GET /api/v1/sync/status` returns whether a handle is configured and the last successful sync time.
+- `GET /api/v1/streak/overview` recalculates and returns current streak, longest streak, target, and today's solved count.
+- `GET /api/v1/streak/heatmap?days=365` returns local-calendar records for the requested window.
+- `GET /api/v1/problems?view=today` returns only today's solved activity plus tried attempts made today.
+- `GET /api/v1/problems?view=tried` returns the all-time tried history, including manual revision frequency.
 
 ---
 

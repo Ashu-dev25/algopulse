@@ -24,7 +24,7 @@
 
 | Feature                     | Description                                                                                     |
 | :-------------------------- | :---------------------------------------------------------------------------------------------- |
-| **Dual Workspaces**         | 🟢 **Solved Archive** + 🟠 **Tried & Unsolved Lab** with 1-click promotion                      |
+| **Dual Workspaces**         | 🟢 **Today's Activity** + 🟠 **Tried & Unsolved Lab** with manual revision frequency            |
 | **Streak Engine**           | User-configurable daily target $N$. Auto-evaluates at midnight in user timezone                 |
 | **LeetCode Sync**           | On-demand GraphQL sync with deduplication and timezone-correct date attribution                 |
 | **URL Validator**           | Strict regex proof-URL checker. Rejects generic problem links. Auto-detects platform            |
@@ -176,9 +176,9 @@ const handleCreateProblem = async (e) => {
 
 ---
 
-### 🔜 PHASE 2 — NEXT (LeetCode Sync + Streak Engine)
+### ✅ PHASE 2 — IMPLEMENTED (LeetCode Sync + Streak Engine)
 
-> Status: **Pending Phase 1 user validation**
+> Status: **Implemented and pending browser validation**
 
 **What to build:**
 
@@ -187,15 +187,15 @@ const handleCreateProblem = async (e) => {
 - `app/services/leetcode_sync.py` — Async GraphQL fetcher using `recentSubmissionList(username, limit: 20)`
   - Auto-converts Unix timestamps to user timezone (e.g. `Asia/Kolkata`)
   - Anti-bleed: submission at `23:30 yesterday` is dated yesterday, not today
-  - Deduplication via unique index `(user_id, platform, p_id)`
-  - `Accepted` → `solved`, everything else → `tried`
+  - Deduplication via unique submission index `(user_id, sub_id)`
+  - `Accepted` → current-day activity, everything else → tried history
 - `app/services/streak_engine.py` — Daily streak calculator
-  - Reads today's `solved_count` from `daily_streaks` collection
+  - Reads today's unique solved activity from `daily_activity` and writes the aggregate to `daily_streaks`
   - Increments `current_streak` if `solved_count >= daily_target`
   - Resets streak to 0 if missed day; updates `longest_streak` if new record
 - `app/api/sync.py` — `POST /sync/leetcode`, `GET /sync/status`
 - `app/api/streak.py` — `GET /streak/overview`, `GET /streak/heatmap`
-- New collection: `daily_streaks` (`~120 bytes/doc`)
+- New collections: `daily_activity` for current-day activity and `daily_streaks` for aggregates
 
 **Frontend:**
 
@@ -294,9 +294,9 @@ const handleCreateProblem = async (e) => {
   "p_url": "https://codeforces.com/contest/1800/problem/A",
   "difficulty": "Medium",
   "tags": ["Two Pointers", "Greedy"],
-  "status": "solved",
+  "status": "tried",
   "attempts": 1,
-  "solved_at": "2026-09-18T10:15:00Z",
+  "solved_at": null,
   "first_attempt_at": "2026-09-18T10:00:00Z",
   "brief_note": "Greedy scan with two pointers (max 280 chars)",
   "notes_url": null,
@@ -305,6 +305,8 @@ const handleCreateProblem = async (e) => {
   "updated_at": "2026-09-18T10:15:00Z"
 }
 ```
+
+Only unresolved/tried problems are retained in `problems`. Solved submissions are written to the compact `daily_activity` ledger for the user's local calendar day and are used for today's dashboard and streak calculation.
 
 ### `daily_streaks` (~120 bytes/doc) — Added in Phase 2
 
@@ -319,6 +321,10 @@ const handleCreateProblem = async (e) => {
   "month": "2026-09"
 }
 ```
+
+### `daily_activity` — Current-day activity ledger
+
+Stores one record per `(user_id, local_date, problem_key)` with the title, platform, status, links, and occurrence time needed for today's view and streak calculation. It is separate from long-term tried history.
 
 ### Phase 3-4 Agent Data Additions
 
@@ -363,7 +369,7 @@ Store only `user_id`, `revision_id`, `kind`, `scheduled_for`, `read_at`, and `cr
 #### Required existing-model adjustments
 
 - Ensure `attempts` increments when a tried submission is logged or a problem is retried; the current create/upsert flow must not silently reset it.
-- Preserve immutable `first_attempt_at`; update `solved_at` only on a transition to solved.
+- Preserve immutable `first_attempt_at` for tried history; solved activity belongs in `daily_activity` rather than long-term `problems`.
 - Normalize tags and stuck categories so telemetry can group them consistently.
 - Add indexes for `(user_id, status, updated_at)`, `(user_id, tags)`, `(user_id, next_review_at)`, and all transient/notification TTL fields.
 

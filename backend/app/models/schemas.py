@@ -62,6 +62,23 @@ class UserResponse(BaseModel):
     last_active_date: Optional[str] = None
     created_at: Optional[datetime] = None
 
+
+def user_response_from_doc(user_doc: dict) -> UserResponse:
+    """Convert a MongoDB user document into the public user response model."""
+    return UserResponse(
+        id=str(user_doc["_id"]),
+        username=user_doc["username"],
+        email=user_doc["email"],
+        lc_handle=user_doc.get("lc_handle"),
+        daily_target=int(user_doc.get("daily_target", 2)),
+        timezone=user_doc.get("timezone", "Asia/Kolkata"),
+        current_streak=int(user_doc.get("current_streak", 0)),
+        longest_streak=int(user_doc.get("longest_streak", 0)),
+        today_solved=int(user_doc.get("today_solved", 0)),
+        last_active_date=user_doc.get("last_active_date"),
+        created_at=user_doc.get("created_at"),
+    )
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -83,6 +100,7 @@ class ProblemCreate(BaseModel):
     brief_note: Optional[str] = Field(None, max_length=280)
     notes_url: Optional[str] = Field(None, max_length=500)
     stuck_category: Optional[StuckCategoryEnum] = None
+    manual_frequency: int = Field(0, ge=0, le=100000)
 
 class ProblemUpdate(BaseModel):
     title: Optional[str] = None
@@ -92,6 +110,7 @@ class ProblemUpdate(BaseModel):
     brief_note: Optional[str] = Field(None, max_length=280)
     notes_url: Optional[str] = Field(None, max_length=500)
     stuck_category: Optional[StuckCategoryEnum] = None
+    manual_frequency: Optional[int] = Field(None, ge=0, le=100000)
 
 class ProblemResponse(BaseModel):
     id: str
@@ -112,6 +131,7 @@ class ProblemResponse(BaseModel):
     stuck_category: Optional[StuckCategoryEnum] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    manual_frequency: int = 0
 
 # --- 5) URL Validation Schemas ---
 class ValidateUrlRequest(BaseModel):
@@ -122,3 +142,37 @@ class ValidateUrlResponse(BaseModel):
     is_valid: bool
     detected_platform: Optional[PlatformEnum] = None
     error_message: Optional[str] = None
+
+# --- 6) Phase 2 Sync and Streak Schemas ---
+class SyncResponse(BaseModel):
+    synced_count: int = 0
+    updated_count: int = 0
+    skipped_count: int = 0
+    failed_count: int = 0
+    last_synced_at: Optional[datetime] = None
+    message: str
+
+class SyncStatusResponse(BaseModel):
+    configured: bool
+    lc_handle: Optional[str] = None
+    last_synced_at: Optional[datetime] = None
+
+class StreakDayResponse(BaseModel):
+    date: str
+    solved_count: int
+    tried_count: int = 0
+    total_count: int = 0
+    target_met: bool
+
+class StreakOverviewResponse(BaseModel):
+    current_streak: int
+    longest_streak: int
+    daily_target: int
+    today_solved: int
+    today_tried: int = 0
+    today_total: int = 0
+    today_target_met: bool
+    last_active_date: Optional[str] = None
+
+class StreakHeatmapResponse(BaseModel):
+    days: List[StreakDayResponse]

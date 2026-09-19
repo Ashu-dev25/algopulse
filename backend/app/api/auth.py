@@ -3,7 +3,7 @@ from datetime import datetime
 
 from app.core.database import get_db
 from app.core.security import get_password_hash, verify_password, create_access_token
-from app.models.schemas import UserRegister, UserLogin, UserResponse, Token, AuthStatusResponse
+from app.models.schemas import UserRegister, UserLogin, UserResponse, Token, AuthStatusResponse, user_response_from_doc
 from app.api.deps import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["User Authentication"])
@@ -106,19 +106,7 @@ async def login_user(login_in: UserLogin):
         access_token = create_access_token(data={"sub": user_id_str})
         
         # 5) Build UserResponse object
-        user_res = UserResponse(
-            id=user_id_str,
-            username=user_doc["username"],
-            email=user_doc["email"],
-            lc_handle=user_doc.get("lc_handle"),
-            daily_target=int(user_doc.get("daily_target", 2)),
-            timezone=user_doc.get("timezone", "Asia/Kolkata"),
-            current_streak=int(user_doc.get("current_streak", 0)),
-            longest_streak=int(user_doc.get("longest_streak", 0)),
-            today_solved=int(user_doc.get("today_solved", 0)),
-            last_active_date=user_doc.get("last_active_date"),
-            created_at=user_doc.get("created_at")
-        )
+        user_res = user_response_from_doc(user_doc)
         
         # 6) Return token and user profile
         return Token(access_token=access_token, token_type="bearer", user=user_res)

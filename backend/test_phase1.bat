@@ -1,12 +1,3 @@
 @echo off
-echo ===================================================
-echo     AlgoPulse - Running Phase 1 Validation Suite
-echo ===================================================
-echo.
-
-cd /d "%~dp0"
-
-python tests\test_phase1.py
-
-echo.
-pause
+rem Compatibility wrapper. Use run_phase_tests.bat for all phase validation.
+call "%~dp0run_phase_tests.bat"

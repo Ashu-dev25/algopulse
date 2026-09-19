@@ -4,7 +4,7 @@ from bson import ObjectId
 
 from app.core.database import get_db
 from app.core.security import decode_access_token
-from app.models.schemas import UserResponse
+from app.models.schemas import UserResponse, user_response_from_doc
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
@@ -50,16 +50,4 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserResponse:
         )
     
     # 6) Return standardized UserResponse
-    return UserResponse(
-        id=str(user_doc["_id"]),
-        username=user_doc["username"],
-        email=user_doc["email"],
-        lc_handle=user_doc.get("lc_handle"),
-        daily_target=int(user_doc.get("daily_target", 2)),
-        timezone=user_doc.get("timezone", "Asia/Kolkata"),
-        current_streak=int(user_doc.get("current_streak", 0)),
-        longest_streak=int(user_doc.get("longest_streak", 0)),
-        today_solved=int(user_doc.get("today_solved", 0)),
-        last_active_date=user_doc.get("last_active_date"),
-        created_at=user_doc.get("created_at")
-    )
+    return user_response_from_doc(user_doc)

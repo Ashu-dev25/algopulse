@@ -49,6 +49,16 @@ async def connect_to_mongo():
         
         # Submissions Collection: deduplication index
         await db_instance.db.submissions.create_index([("user_id", 1), ("sub_id", 1)], unique=True)
+
+        # Phase 2: track sync state per user without growing the user document
+        await db_instance.db.sync_state.create_index("user_id", unique=True)
+
+        # Current-day activity is retained separately from tried-problem history
+        await db_instance.db.daily_activity.create_index(
+            [("user_id", 1), ("local_date", 1), ("problem_key", 1)],
+            unique=True,
+        )
+        await db_instance.db.daily_activity.create_index([("user_id", 1), ("local_date", 1)])
         
         logger.info("MongoDB indexes verified successfully.")
     except Exception as e:

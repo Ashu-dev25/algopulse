@@ -9,6 +9,8 @@ from app.api.auth import router as auth_router
 from app.api.users import router as users_router
 from app.api.problems import router as problems_router
 from app.api.validator import router as validator_router
+from app.api.sync import router as sync_router
+from app.api.streak import router as streak_router
 
 # 1) Configure application logging
 logging.basicConfig(
@@ -21,7 +23,7 @@ logger = logging.getLogger("algopulse.main")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Step A: Connect to MongoDB on startup
-    logger.info("Initializing AlgoPulse Backend (Phase 1)...")
+    logger.info("Initializing AlgoPulse Backend (Phase 2)...")
     await connect_to_mongo()
     yield
     # Step B: Close MongoDB connection on shutdown
@@ -30,8 +32,8 @@ async def lifespan(app: FastAPI):
 
 # 3) Initialize FastAPI application instance
 app = FastAPI(
-    title="AlgoPulse API - Phase 1",
-    description="Core Backend, User Authentication, User & Problem CRUD, and Strict Submission URL Validator",
+    title="AlgoPulse API - Phase 2",
+    description="CRUD, authentication, strict URL validation, LeetCode sync, and streak engine",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -45,19 +47,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 5) Mount Phase 1 Routers under /api/v1
+# 5) Mount application routers under /api/v1
 api_prefix = "/api/v1"
 app.include_router(auth_router, prefix=api_prefix)
 app.include_router(users_router, prefix=api_prefix)
 app.include_router(problems_router, prefix=api_prefix)
 app.include_router(validator_router, prefix=api_prefix)
+app.include_router(sync_router, prefix=api_prefix)
+app.include_router(streak_router, prefix=api_prefix)
 
 # 6) Root health check endpoint
 @app.get("/")
 async def root_health_check():
     return {
         "app": "AlgoPulse Backend",
-        "phase": "Phase 1 - Core Auth, User & Problem CRUD, and Strict URL Validator",
+        "phase": "Phase 2 - LeetCode Sync and Streak Engine",
         "status": "online",
         "version": settings.VERSION,
         "docs_url": "/docs"

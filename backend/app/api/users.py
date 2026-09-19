@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from bson import ObjectId
 
 from app.core.database import get_db
-from app.models.schemas import UserResponse, UserProfileUpdate
+from app.models.schemas import UserResponse, UserProfileUpdate, user_response_from_doc
 from app.api.deps import get_current_user
 
 router = APIRouter(prefix="/users", tags=["User Profile CRUD"])
@@ -53,19 +53,7 @@ async def update_user_profile(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
             
         # 5) Return updated UserResponse
-        return UserResponse(
-            id=str(updated_doc["_id"]),
-            username=updated_doc["username"],
-            email=updated_doc["email"],
-            lc_handle=updated_doc.get("lc_handle"),
-            daily_target=int(updated_doc.get("daily_target", 2)),
-            timezone=updated_doc.get("timezone", "Asia/Kolkata"),
-            current_streak=int(updated_doc.get("current_streak", 0)),
-            longest_streak=int(updated_doc.get("longest_streak", 0)),
-            today_solved=int(updated_doc.get("today_solved", 0)),
-            last_active_date=updated_doc.get("last_active_date"),
-            created_at=updated_doc.get("created_at")
-        )
+        return user_response_from_doc(updated_doc)
     except HTTPException:
         raise
     except Exception as e:
@@ -86,13 +74,18 @@ async def delete_user_account(current_user: UserResponse = Depends(get_current_u
         
         # 3) Delete daily streaks belonging to user
         await db.daily_streaks.delete_many({"user_id": current_user.id})
+
+        # 4) Delete Phase 2 activity, sync markers, and imported submission keys
+        await db.daily_activity.delete_many({"user_id": current_user.id})
+        await db.sync_state.delete_many({"user_id": current_user.id})
+        await db.submissions.delete_many({"user_id": current_user.id})
         
-        # 4) Delete user account document
+        # 5) Delete user account document
         res = await db.users.delete_one({"_id": ObjectId(current_user.id)})
         if res.deleted_count == 0:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
             
-        # 5) Return success response
+        # 6) Return success response
         return {
             "status": "success",
             "message": f"Account '{current_user.username}' and associated data have been permanently deleted."

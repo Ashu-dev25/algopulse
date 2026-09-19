@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { X, User, Settings, Trash2, Globe, Target } from 'lucide-react';
-import { usersApi } from '../api/client';
+import { streakApi, usersApi } from '../api/client';
 
-export default function ProfileModal({ isOpen, onClose, user, onProfileUpdated, onAccountDeleted }) {
+export default function ProfileModal({ isOpen, onClose, user, onProfileUpdated, onAccountDeleted, onActivityReset }) {
   // 1) Component local state
   const [lcHandle, setLcHandle] = useState(user?.lc_handle || '');
   const [dailyTarget, setDailyTarget] = useState(user?.daily_target || 2);
@@ -10,6 +10,8 @@ export default function ProfileModal({ isOpen, onClose, user, onProfileUpdated, 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   if (!isOpen) return null;
 
@@ -47,6 +49,20 @@ export default function ProfileModal({ isOpen, onClose, user, onProfileUpdated, 
       onAccountDeleted();
     } catch (err) {
       setError(err.message || 'Failed to delete account.');
+    }
+  };
+
+  const handleResetBeforeToday = async () => {
+    setIsResetting(true);
+    setError('');
+    try {
+      await streakApi.resetBeforeToday();
+      setShowResetConfirm(false);
+      onActivityReset?.();
+    } catch (err) {
+      setError(err.message || 'Failed to reset history.');
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -142,6 +158,32 @@ export default function ProfileModal({ isOpen, onClose, user, onProfileUpdated, 
             </button>
           </div>
         </form>
+
+        <div style={{ borderTop: '1px solid var(--border-subtle)', marginTop: '20px', paddingTop: '16px' }}>
+          {!showResetConfirm ? (
+            <button
+              type="button"
+              onClick={() => setShowResetConfirm(true)}
+              style={{ background: 'transparent', border: 'none', color: 'var(--amber)', fontSize: '0.8rem', cursor: 'pointer' }}
+            >
+              Start streak from today
+            </button>
+          ) : (
+            <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '12px', borderRadius: '8px' }}>
+              <p style={{ fontSize: '0.8rem', color: '#fbbf24', marginBottom: '8px' }}>
+                Delete all activity before today and recalculate the streak?
+              </p>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button type="button" onClick={handleResetBeforeToday} disabled={isResetting} className="btn-primary">
+                  {isResetting ? 'Resetting...' : 'Start From Today'}
+                </button>
+                <button type="button" onClick={() => setShowResetConfirm(false)} className="btn-secondary">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Delete Account Section */}
         <div style={{ borderTop: '1px solid var(--border-subtle)', marginTop: '20px', paddingTop: '16px' }}>
